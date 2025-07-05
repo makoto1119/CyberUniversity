@@ -2,6 +2,8 @@
 config
 *.log
 mail_data/
+mail_mask/
+
 
 # Python関連
 __pycache__/
