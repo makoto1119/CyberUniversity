@@ -161,7 +161,8 @@ def main():
             raw_email = data[b'RFC822']
             msg = email.message_from_bytes(raw_email)
             subject = msg.get("Subject", f"no-subject-{i}")
-            filename = SAVE_DIR / f"mail_{i+1:03}.txt"
+            dir_name = SAVE_DIR.name  # ディレクトリ名を取得
+            filename = SAVE_DIR / f"{dir_name}_{i+1:03}.txt"
             
             # 本文抽出（簡略化）
             body = ""

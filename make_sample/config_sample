@@ -10,5 +10,6 @@ MAX_MAILS=10
 LABEL_NAME=
 
 # 保存設定
-SAVE_DIR=./mails
+SAVE_DIR=./mail_data
+MASK_DIR=./mail_mask
 
