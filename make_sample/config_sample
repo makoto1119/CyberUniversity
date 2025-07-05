@@ -1,0 +1,14 @@
+# メールアカウント情報
+EMAIL_ADDRESS=youraddress@gmail.com
+EMAIL_PASSWORD=your-app-password
+
+# メール取得条件
+DATE_SINCE=01-Jul-2025
+MAX_MAILS=10
+
+# ラベル指定（空の場合はINBOX、例: Important, Work, INBOX/MyLabel）
+LABEL_NAME=
+
+# 保存設定
+SAVE_DIR=./mails
+
