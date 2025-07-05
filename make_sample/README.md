@@ -74,7 +74,7 @@ SAVE_DIR=./mails
 ## 使用方法
 
 ```bash
-python get_mail_using_imap.py
+python get_mail_imap.py
 ```
 
 実行すると：
@@ -115,7 +115,7 @@ mails/
 ```
 .
 ├── README.md              # このファイル
-├── get_mail_using_imap.py # メイン実行スクリプト
+├── get_mail_imap.py # メイン実行スクリプト
 ├── config_sample          # 設定ファイルのサンプル
 ├── config                 # 実際の設定ファイル（要作成）
 └── mails/                 # メール保存ディレクトリ（自動作成）
