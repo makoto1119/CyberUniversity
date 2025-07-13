@@ -40,7 +40,7 @@ $ tree -LFa 2 -I .git ./CyberUniversity
 
 ```
 
-.gitignore 内容
+## .gitignore 
 
 ```
 $ cat .gitignore 
@@ -53,6 +53,12 @@ mail_mask/
 
 以下略 (以降は一般的なignore設定)
 ```
+
+## サンプルコード
+形態素解析処理の参考コードは以下のディレクトリに格納
+- `preprocess_fuzzy/morph_sample/`
+- 詳しくはディレクトリ内の README.md を参照のこと 
+
 
 ---
 
