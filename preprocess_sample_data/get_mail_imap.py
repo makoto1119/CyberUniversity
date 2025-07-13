@@ -5,6 +5,7 @@
 import os
 import email
 import re
+import shutil
 from email.header import decode_header
 from imapclient import IMAPClient
 from datetime import datetime
@@ -114,7 +115,10 @@ def main():
     SAVE_DIR       = Path(config.get("SAVE_DIR", "./mails"))
     LABEL_NAME     = config.get("LABEL_NAME", "")  # ラベル指定（空の場合はINBOX）
     
-    # 保存ディレクトリ作成
+    # 保存ディレクトリ初期化/作成
+    if SAVE_DIR.exists():
+        print(f"[INFO] 既存の保存先 {SAVE_DIR} を初期化中...")
+        shutil.rmtree(SAVE_DIR)
     SAVE_DIR.mkdir(parents=True, exist_ok=True)
     
     print(f"Email Address: {EMAIL_ADDRESS}")
