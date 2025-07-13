@@ -172,14 +172,15 @@ def main():
             body = ""
             if msg.is_multipart():
                 for part in msg.walk():
-                    if part.get_content_type() == "text/plain":
-                        try:
-                            body = part.get_payload(decode=True).decode(
-                                part.get_content_charset() or "utf-8", errors="ignore"
-                            )
-                            break
-                        except Exception:
-                            continue
+                    ctype = part.get_content_type()
+                    if ctype == "text/plain":
+                        body = part.get_payload(decode=True).decode(part.get_content_charset() or "utf-8", errors="ignore")
+                        break
+                    elif ctype == "text/html" and not body:
+                        html_body = part.get_payload(decode=True).decode(part.get_content_charset() or "utf-8", errors="ignore")
+                        # 可能なら HTML をテキスト化
+                        import re
+                        body = re.sub('<[^<]+?>', '', html_body)  # 簡易HTMLタグ除去
             else:
                 try:
                     body = msg.get_payload(decode=True).decode(
