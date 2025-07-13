@@ -7,31 +7,51 @@
 
 ## ディレクトリ構成
 
-以下のコマンドで確認できます：
-
-```
-$ tree -LFa 2 -I .git ./CyberUniversity
-```
-
-出力例：  
 ＊.gitignore で除外しているファイル・ディレクトリも含んでいます
 
 ```
-CyberUniversity/
+$ tree -LFa 2 -I .git ./CyberUniversity
+
+./CyberUniversity/
 ├── .gitignore                         # Git管理から除外するファイル・ディレクトリ設定
 ├── README.md                          # リポジトリ全体の説明ファイル（本ファイル）
 ├── mail_mask -> preprocess_sample_data/mail_mask/
-│                                       # マスク済みメールディレクトリへのシンボリックリンク
-├── preprocess_fuzzy/                  # ゆらぎ処理（正規化）用の実験・スクリプト格納予定
-├── preprocess_sample_data/           # サンプルデータ作成（取得・マスク）の処理群
+│                                      # マスク済みメールディレクトリへのシンボリックリンク。他検証へのデータ共有
+├── preprocess_fuzzy/                  
+├── sample_mail_masked10/              # 実データは動的に変動してしまうため、サンプル開示用
+│   ├── README.md                      # サンプルデータについての README
+│   └── mail_data_001.txt 〜 mail_data_010.txt  # サンプルデータ
+├── preprocess_fuzzy/
+│   ├── README.md
+│   ├── fuzzy_patterns.json
+│   └── normalize_text.py
+├── preprocess_sample_data/            # サンプルデータ作成（取得・マスク）の処理群
 │   ├── README.md                      # このディレクトリ内専用の補足説明
+│   ├── config                         # 自分の環境で実際に使用している config (.gitignore対象)
 │   ├── config_sample                  # 公開用の設定テンプレート
 │   ├── get_mail_imap.py*              # GmailからメールをIMAP経由で取得するスクリプト
-│   ├── mail_mask/                     # マスク済みのメールデータ（個人情報など除去済）
+│   ├── mail_data/                     # マスク前の実メールデータ (.gitignore対象)
+│   ├── mail_mask/                     # マスク済みのメールデータ（個人情報など除去済）(.gitignore対象)
 │   ├── mask_mail_texts.py*            # テキスト中の情報をマスク処理するスクリプト
-│   ├── masked.log                     # マスキング処理の置換ログ（件数・種別など）
+│   ├── masked.log                     # マスキング処理の置換ログ（件数・種別など）(.gitignore対象)
 │   ├── zip_mail_data.sh*              # 元データを ZIP 圧縮するシェルスクリプト
 │   └── zip_mail_mask.sh*              # マスクデータを ZIP 圧縮するシェルスクリプト
+
+
+```
+
+.gitignore 内容
+
+```
+$ cat .gitignore 
+
+# for this project
+config
+*.log
+mail_data/
+mail_mask/
+
+以下略 (以降は一般的なignore設定)
 ```
 
 ---
