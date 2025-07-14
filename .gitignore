@@ -3,6 +3,7 @@ config
 *.log
 mail_data/
 mail_mask/
+mail_morphological/
 
 
 # Python関連

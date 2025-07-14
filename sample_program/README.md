@@ -28,4 +28,5 @@ sample_program/
 - ゆらぎ吸収の検証を開始するための事前処理用として適正改変予定
 - 改変後のプログラムは `preprocess_sample_data` に格納、使用予定
 - ゆらぎ吸収については、別途 `preprocess_fuzzy/` ディレクトリで開発予定  
+- 書籍とサンプルプログラムでは MeCab を使っているが、janome を使用予定
 

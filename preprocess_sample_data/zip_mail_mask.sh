@@ -14,17 +14,17 @@ if [ ! -f "$CONFIG_FILE" ]; then
   exit 1
 fi
 
-# configから MASK_DIR の読み込み
-MASK_DIR=$(grep '^MASK_DIR=' "$CONFIG_FILE" | cut -d '=' -f2)
+# configから MASKED_DIR の読み込み
+MASKED_DIR=$(grep '^MASKED_DIR=' "$CONFIG_FILE" | cut -d '=' -f2)
 
 # ディレクトリ存在チェック
-if [ ! -d "$MASK_DIR" ]; then
-  echo "Error: MASK_DIR ディレクトリが存在しません: $MASK_DIR"
+if [ ! -d "$MASKED_DIR" ]; then
+  echo "Error: MASKED_DIR ディレクトリが存在しません: $MASKED_DIR"
   exit 1
 fi
 
 # mail_*.txt をまとめて ZIP 化
-zip -j "$ZIP_NAME" "$MASK_DIR"/mail_*.txt
+zip -j "$ZIP_NAME" "$MASKED_DIR"/mail_*.txt
 
 # 結果表示
 if [ $? -eq 0 ]; then

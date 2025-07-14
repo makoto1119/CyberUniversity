@@ -15,27 +15,28 @@ $ tree -LFa 2 -I .git ./CyberUniversity
 ./CyberUniversity/
 ├── .gitignore                         # Git管理から除外するファイル・ディレクトリ設定
 ├── README.md                          # リポジトリ全体の説明ファイル（本ファイル）
-├── mail_mask -> preprocess_sample_data/mail_mask/
-│                                      # マスク済みメールディレクトリへのシンボリックリンク。他検証へのデータ共有
-├── preprocess_fuzzy/                  
-├── sample_mail_masked10/              # 実データは動的に変動してしまうため、サンプル開示用
-│   ├── README.md                      # サンプルデータについての README
-│   └── mail_data_001.txt 〜 mail_data_010.txt  # サンプルデータ
 ├── preprocess_fuzzy/
 │   ├── README.md
 │   ├── fuzzy_patterns.json
 │   └── normalize_text.py
+├── sample_mail_masked10/              # 実データは動的に変動してしまうため、サンプル開示用
+│   ├── README.md                      # サンプルデータについての README
+│   └── mail_data_001.txt 〜 mail_data_010.txt  # サンプルデータ
 ├── preprocess_sample_data/            # サンプルデータ作成（取得・マスク）の処理群
 │   ├── README.md                      # このディレクトリ内専用の補足説明
 │   ├── config                         # 自分の環境で実際に使用している config (.gitignore対象)
 │   ├── config_sample                  # 公開用の設定テンプレート
 │   ├── get_mail_imap.py*              # GmailからメールをIMAP経由で取得するスクリプト
 │   ├── mail_data/                     # マスク前の実メールデータ (.gitignore対象)
-│   ├── mail_mask/                     # マスク済みのメールデータ（個人情報など除去済）(.gitignore対象)
+│   ├── mail_mask/                     # 個人情報などマスク済みのメールデータ(.gitignore対象)
+│   ├── mail_morphological/            # 形態素解析済みのメールデータ (.gitignore対象)
 │   ├── mask_mail_texts.py*            # テキスト中の情報をマスク処理するスクリプト
 │   ├── masked.log                     # マスキング処理の置換ログ（件数・種別など）(.gitignore対象)
+│   ├── morphological_mail_texts.py*   # 形態素解析まわりを処理するスクリプト
 │   ├── zip_mail_data.sh*              # 元データを ZIP 圧縮するシェルスクリプト
 │   └── zip_mail_mask.sh*              # マスクデータを ZIP 圧縮するシェルスクリプト
+├── shared_mail_mask -> preprocess_sample_data/mail_mask/                   # 他検証へのデータ共有用シンボリックリンク
+└── shared_mail_morphological -> preprocess_sample_data/mail_morphological/ # 他検証へのデータ共有用シンボリックリンク
 
 
 ```

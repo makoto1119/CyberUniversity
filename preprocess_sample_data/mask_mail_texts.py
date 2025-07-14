@@ -64,7 +64,7 @@ def mask_text(text):
 def main():
     config = load_config()
     SRC_DIR = Path(config.get("SAVE_DIR", "./mail_data"))
-    DST_DIR = Path(config.get("MASK_DIR", "./mail_mask"))
+    DST_DIR = Path(config.get("MASKED_DIR", "./mail_mask"))
     
     # DST_DIRを削除して初期化
     if DST_DIR.exists():
@@ -75,6 +75,7 @@ def main():
     print(f"{DST_DIR} を作成しました")
 
     dir_name = DST_DIR.name  # 保存ファイルのprefixに使用
+    process_count = 0
     
     # ログファイルの初期化
     log_file = Path("masked.log")
@@ -97,12 +98,13 @@ def main():
 
         with open(masked_filename, "w", encoding="utf-8") as f:
             f.write(masked_text)
+            process_count += 1
         
         # ログ出力
         with open(log_file, "a", encoding="utf-8") as log:
             log.write(f"{path.name},{masked_filename.name},{stats['NAME']},{stats['EMAIL']},{stats['COMPANY']},{stats['URL']},{stats['PROFILE']}\n")
 
-    print(f"Success. : {DST_DIR.resolve()} に {dir_name}_NNN.txt 形式で保存しました")
+    print(f"Completed: {process_count} files saved to '{DST_DIR}' に {dir_name}_NNN.txt 形式で保存しました")
     print(f"ログファイル : {log_file.resolve()} に処理結果を保存しました")
 
 if __name__ == "__main__":
