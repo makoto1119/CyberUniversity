@@ -4,6 +4,8 @@ config
 mail_data/
 mail_mask/
 mail_morphological/
+old/
+tmp/
 
 
 # Python関連
