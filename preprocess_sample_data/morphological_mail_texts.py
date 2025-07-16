@@ -29,7 +29,7 @@ def main():
     config = load_config()
     MASKED_DIR = Path(config.get("MASKED_DIR", "./mail_mask"))
     OUTPUT_DIR = Path(config.get("MORPHOLOGICAL_DIR", "./mail_mask"))
-    STOPWORDS_PATH = Path(config.get("STOPWORDS_PATH", "./sample_program/stopwords.txt"))
+    STOPWORDS_PATH = Path(config.get("STOPWORDS_PATH", "./stopwords.txt"))
 
     tokenizer = Tokenizer()
     stopwords = load_stopwords(STOPWORDS_PATH)
@@ -57,8 +57,11 @@ def main():
 
         tokens = []
         for token in tokenizer.tokenize(body_part):
+            part = token.part_of_speech.split(',')[0]
+            if part not in ['名詞', '動詞', '形容詞']:  # 品詞フィルタ
+                continue
             base = token.base_form
-            if base in stopwords or re.fullmatch(r"\W+", base):
+            if base in stopwords:
                 continue
             tokens.append(base)
 
