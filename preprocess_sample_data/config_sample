@@ -27,11 +27,13 @@ STOPWORDS_PATH=./stopwords.txt               # ストップワードファイル
 # 形態素解析オプション (使用プログラム: morphological_mail_texts.py)
 # -----------------------------------------------------------------------------
 ENABLE_POS_FILTER=true                       # 品詞フィルター有効/無効 (true/false)
-                                            # true: 名詞・動詞・形容詞のみ抽出
-                                            # false: 全品詞を対象
+                                             # true: 名詞・動詞・形容詞のみ抽出
+                                             # false: 全品詞を対象
+POS_FILTER_MODE=whitelist                    # 'whitelist' または 'blacklist'
+
 ENABLE_BASE_FORM=true                        # 原形正規化有効/無効 (true/false)
-                                            # true: 単語を原形（base_form）に正規化
-                                            # false: 表層形（surface）をそのまま使用
+                                             # true: 単語を原形（base_form）に正規化
+                                             # false: 表層形（surface）をそのまま使用
 
 # =============================================================================
 # 処理フロー:
