@@ -1,32 +1,52 @@
-# サンプルプログラム - 形態素解析
+# サンプルプログラム - 機械学習・深層学習
 
 ## 概要
 
-このディレクトリには、形態素解析の学習・検証用サンプルプログラムを格納しています。
-これらのプログラムは、卒業研究「テキストマイニングによるメール本文の分類実験」における前処理技術の参考として使用します。
+このディレクトリには、機械学習・深層学習の学習・検証用サンプルプログラムを格納しています。
+これらのプログラムは、卒業研究「テキストマイニングによるメール本文の分類実験」における前処理技術および分類モデルの参考として使用します。
 
 ## 出典
 
-- 元リポジトリ: https://github.com/kujirahand/book-mlearn-gyomu/tree/master/src/ch4/Morphological_Analysis
-- 書籍: 「Pythonによる AI・機械学習・深層学習アプリのつくり方」第4章の2 形態素解析
+- 元リポジトリ: https://github.com/kujirahand/book-mlearn-gyomu
+- 書籍: 「Pythonによる AI・機械学習・深層学習アプリのつくり方」
+- 取得範囲: 第4章〜第6章のサンプルコード（ch4〜ch6）
+- 詳細な説明や使用方法については、元リポジトリのREADMEを参照してください
 
-## ファイル構成
-* リポジトリ内のまま配置
+## ディレクトリ構成
 
 ```
 sample_program/
-├── README.md                    # 本ファイル
-├── Morphological_Analysis.py    # 基本的な形態素解析サンプル
-├── Morphological_Analysis2.py   # NEologd辞書を使用した形態素解析
-├── Morphological_Analysis3.py   # ストップワードの除去
-└── mecab-test.ipynb             # Jupyter Notebook形式のMeCab動作確認
+├── README.md                                      # 本ファイル
+├── ch4/                                          # 第4章: 自然言語処理
+│   ├── Doc2Vec/                                  # Doc2Vec実装サンプル
+│   ├── Morphological_Analysis/                   # 形態素解析サンプル
+│   │   ├── Morphological_Analysis.py             # 基本的な形態素解析
+│   │   ├── Morphological_Analysis2.py            # NEologd辞書を使用した形態素解析
+│   │   ├── Morphological_Analysis3.py            # ストップワードの除去
+│   │   └── mecab-test.ipynb                      # Jupyter Notebook形式のMeCab動作確認
+│   ├── Word2Vec/                                 # Word2Vec実装サンプル
+│   ├── lang/                                     # 言語判定サンプル
+│   ├── markov/                                   # マルコフ連鎖サンプル
+│   └── spam_checker/                             # スパムメール判定サンプル
+├── ch5/                                          # 第5章: 機械学習
+│   ├── digits/                                   # 手書き数字認識（MNIST）
+│   ├── iris/                                     # アヤメ分類
+│   ├── janken/                                   # じゃんけん画像認識
+│   ├── recog/                                    # 画像認識（CIFAR-10）
+│   └── score/                                    # カタカナ文字認識
+└── ch6/                                          # 第6章: 深層学習の実用例
+    ├── genre/                                    # テキスト分類
+    ├── height_weight/                            # 身長体重予測
+    ├── mask/                                     # マスク着用判定
+    ├── photo_calorie/                            # 料理画像からカロリー推定
+    └── save_load/                                # モデルの保存・読み込み
 ```
-
 
 ## 卒業研究での活用予定
 
+- 第4章の形態素解析・テキスト処理技術を参考に、メール本文の前処理を実装
+- 第4章のスパムメール判定を参考に、メール分類モデルの基礎を構築
+- 第5章・第6章の機械学習・深層学習手法を参考に、分類精度の向上を検討
 - ゆらぎ吸収の検証を開始するための事前処理用として適正改変予定
-- 改変後のプログラムは `preprocess_sample_data` に格納、使用予定
-- ゆらぎ吸収については、別途 `preprocess_fuzzy/` ディレクトリで開発予定  
+- 改変後のプログラムは `preprocess_sample_data` や `classification_model` に格納予定
 - 書籍とサンプルプログラムでは MeCab を使っているが、janome を使用予定
-
