@@ -1,15 +1,41 @@
-# メールアカウント情報
-EMAIL_ADDRESS=youraddress@gmail.com
-EMAIL_PASSWORD=your-app-password
+# =============================================================================
+# CyberUniversity 卒業研究 - メール前処理設定ファイル (サンプル)
+# =============================================================================
 
-# メール取得条件
-DATE_SINCE=01-Jul-2025
-MAX_MAILS=10
+# -----------------------------------------------------------------------------
+# メールアカウント情報 (使用プログラム: get_mail_imap.py)
+# -----------------------------------------------------------------------------
+EMAIL_ADDRESS=youraddress@gmail.com          # Gmail IMAP接続用メールアドレス
+EMAIL_PASSWORD=your-app-password             # Gmail アプリパスワード
 
-# ラベル指定（空の場合はINBOX、例: Important, Work, INBOX/MyLabel）
-LABEL_NAME=
+# -----------------------------------------------------------------------------
+# メール取得条件 (使用プログラム: get_mail_imap.py)
+# -----------------------------------------------------------------------------
+DATE_SINCE=01-Jul-2025                       # 取得開始日 (DD-MMM-YYYY形式)
+MAX_MAILS=10                                 # 最大取得件数
+LABEL_NAME=                                  # 取得対象ラベル (空=INBOX、例: Important, Work)
 
-# 保存設定
-SAVE_DIR=./mail_data
-MASK_DIR=./mail_mask
+# -----------------------------------------------------------------------------
+# ディレクトリ・ファイルパス設定
+# -----------------------------------------------------------------------------
+SAVE_DIR=./mail_data                         # 生メール保存先 (get_mail_imap.py)
+MASKED_DIR=./mail_mask                       # マスク済みメール保存先 (mask_mail_texts.py → morphological_mail_texts.py)
+MORPHOLOGICAL_DIR=./mail_morphological       # 形態素解析結果保存先 (morphological_mail_texts.py)
+STOPWORDS_PATH=./stopwords.txt               # ストップワードファイル (morphological_mail_texts.py)
 
+# -----------------------------------------------------------------------------
+# 形態素解析オプション (使用プログラム: morphological_mail_texts.py)
+# -----------------------------------------------------------------------------
+ENABLE_POS_FILTER=true                       # 品詞フィルター有効/無効 (true/false)
+                                            # true: 名詞・動詞・形容詞のみ抽出
+                                            # false: 全品詞を対象
+ENABLE_BASE_FORM=true                        # 原形正規化有効/無効 (true/false)
+                                            # true: 単語を原形（base_form）に正規化
+                                            # false: 表層形（surface）をそのまま使用
+
+# =============================================================================
+# 処理フロー:
+# 1. get_mail_imap.py      : Gmail → SAVE_DIR (生メール)
+# 2. mask_mail_texts.py    : SAVE_DIR → MASKED_DIR (個人情報マスク)
+# 3. morphological_mail_texts.py : MASKED_DIR → MORPHOLOGICAL_DIR (形態素解析)
+# =============================================================================

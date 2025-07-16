@@ -32,19 +32,47 @@ EMAIL_PASSWORD=your-app-password
 DATE_SINCE=01-Jul-2025
 MAX_MAILS=10
 LABEL_NAME=
-SAVE_DIR=./mails
+SAVE_DIR=./mail_data
+MASKED_DIR=./mail_mask
+MORPHOLOGICAL_DIR=./mail_morphological
+STOPWORDS_PATH=./stopwords.txt
+ENABLE_POS_FILTER=true
+ENABLE_BASE_FORM=true
 ```
 
 ### 設定項目
 
-| 項目 | 説明 | デフォルト値 |
-|------|------|-------------|
-| `EMAIL_ADDRESS` | Gmailアドレス | 必須 |
-| `EMAIL_PASSWORD` | Gmailアプリパスワード | 必須 |
-| `DATE_SINCE` | 取得開始日 | 01-Jul-2025 |
-| `MAX_MAILS` | 最大取得件数 | 10 |
-| `LABEL_NAME` | 取得対象ラベル | 空（INBOX） |
-| `SAVE_DIR` | 保存先ディレクトリ | ./mails |
+| 項目 | 説明 | デフォルト値 | 使用プログラム |
+|------|------|-------------|---------------|
+| `EMAIL_ADDRESS` | Gmailアドレス | 必須 | get_mail_imap.py |
+| `EMAIL_PASSWORD` | Gmailアプリパスワード | 必須 | get_mail_imap.py |
+| `DATE_SINCE` | 取得開始日 | 01-Jul-2025 | get_mail_imap.py |
+| `MAX_MAILS` | 最大取得件数 | 10 | get_mail_imap.py |
+| `LABEL_NAME` | 取得対象ラベル | 空（INBOX） | get_mail_imap.py |
+| `SAVE_DIR` | 生メール保存先 | ./mail_data | get_mail_imap.py |
+| `MASKED_DIR` | マスク済み保存先 | ./mail_mask | mask_mail_texts.py |
+| `MORPHOLOGICAL_DIR` | 形態素解析結果保存先 | ./mail_morphological | morphological_mail_texts.py |
+| `STOPWORDS_PATH` | ストップワードファイル | ./stopwords.txt | morphological_mail_texts.py |
+| `ENABLE_POS_FILTER` | 品詞フィルター有効/無効 | true | morphological_mail_texts.py |
+| `ENABLE_BASE_FORM` | 原形正規化有効/無効 | true | morphological_mail_texts.py |
+
+### 形態素解析オプション
+
+#### 品詞フィルター（ENABLE_POS_FILTER）
+- `true`: 名詞・動詞・形容詞のみを抽出
+- `false`: 全品詞を対象とする
+
+#### 原形正規化（ENABLE_BASE_FORM）
+- `true`: 単語を原形（base_form）に正規化（例: "走った" → "走る"）
+- `false`: 表層形（surface）をそのまま使用（例: "走った" → "走った"）
+
+#### 実験パターン例
+| 品詞フィルター | 原形正規化 | 効果 |
+|---------------|-----------|------|
+| true | true | 名詞・動詞・形容詞の原形のみ（推奨） |
+| true | false | 名詞・動詞・形容詞の表層形 |
+| false | true | 全品詞の原形 |
+| false | false | 全品詞の表層形 |
 
 ### ラベル指定について
 
@@ -84,8 +112,19 @@ SAVE_DIR=./mails
 
 ## 使用方法
 
+### 1. メール取得
 ```bash
 python get_mail_imap.py
+```
+
+### 2. 個人情報マスク処理
+```bash
+python mask_mail_texts.py
+```
+
+### 3. 形態素解析・ストップワード除去
+```bash
+python morphological_mail_texts.py
 ```
 
 実行すると：
@@ -93,6 +132,13 @@ python get_mail_imap.py
 2. Gmail IMAPサーバーに接続
 3. 指定条件のメールを取得
 4. `SAVE_DIR`で指定したディレクトリに保存
+
+## 処理フロー
+
+```
+Gmail → 生メール → マスク済み → 形態素解析済み
+       (SAVE_DIR) (MASKED_DIR) (MORPHOLOGICAL_DIR)
+```
 
 ## 出力ファイル
 

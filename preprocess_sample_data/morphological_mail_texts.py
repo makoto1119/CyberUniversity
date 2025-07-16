@@ -30,6 +30,8 @@ def main():
     MASKED_DIR = Path(config.get("MASKED_DIR", "./mail_mask"))
     OUTPUT_DIR = Path(config.get("MORPHOLOGICAL_DIR", "./mail_mask"))
     STOPWORDS_PATH = Path(config.get("STOPWORDS_PATH", "./stopwords.txt"))
+    ENABLE_POS_FILTER = config.get("ENABLE_POS_FILTER", "true").lower() == "true"
+    ENABLE_BASE_FORM = config.get("ENABLE_BASE_FORM", "true").lower() == "true"
 
     tokenizer = Tokenizer()
     stopwords = load_stopwords(STOPWORDS_PATH)
@@ -41,6 +43,8 @@ def main():
 
     OUTPUT_DIR.mkdir(exist_ok=True)
     print(f"{OUTPUT_DIR} を作成しました")
+    print(f"品詞フィルター: {'有効' if ENABLE_POS_FILTER else '無効'}")
+    print(f"原形正規化: {'有効' if ENABLE_BASE_FORM else '無効'}")
 
     dir_name = OUTPUT_DIR.name  # 保存ファイルのprefixに使用
     process_count = 0
@@ -57,13 +61,18 @@ def main():
 
         tokens = []
         for token in tokenizer.tokenize(body_part):
-            part = token.part_of_speech.split(',')[0]
-            if part not in ['名詞', '動詞', '形容詞']:  # 品詞フィルタ
+            # 品詞フィルターが有効な場合のみ品詞チェック
+            if ENABLE_POS_FILTER:
+                part = token.part_of_speech.split(',')[0]
+                if part not in ['名詞', '動詞', '形容詞']:  # 品詞フィルタ
+                    continue
+            
+            # 原形正規化の有効/無効に応じて単語形を選択
+            word = token.base_form if ENABLE_BASE_FORM else token.surface
+            
+            if word in stopwords:
                 continue
-            base = token.base_form
-            if base in stopwords:
-                continue
-            tokens.append(base)
+            tokens.append(word)
 
         tokenized_body = " ".join(tokens)
         result = f"{subject_part.strip()}\n\nMailBody----\n{tokenized_body}\n"
