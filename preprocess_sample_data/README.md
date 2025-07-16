@@ -124,12 +124,23 @@ mails/
 ## ファイル構成
 
 ```
-.
-├── README.md              # このファイル
-├── get_mail_imap.py       # メイン実行スクリプト
-├── config_sample          # 設定ファイルのサンプル
-├── config                 # 実際の設定ファイル（要作成）
-└── mails/                 # メール保存ディレクトリ（自動作成）
+preprocess_sample_data/
+├── README.md                          # このファイル
+├── get_mail_imap.py*                  # GmailからメールをIMAP経由で取得するスクリプト
+├── mask_mail_texts.py*                # テキスト中の情報をマスク処理するスクリプト
+├── morphological_mail_texts.py*       # 形態素解析まわりを処理するスクリプト
+├── zip_mail_data.sh*                  # 元データを ZIP 圧縮するシェルスクリプト
+├── zip_mail_mask.sh*                  # マスクデータを ZIP 圧縮するシェルスクリプト
+├── config_sample                      # 公開用の設定テンプレート
+├── config                             # 実際の設定ファイル (.gitignore対象)
+├── stopwords.txt                      # 日本語ストップワード一覧
+├── masked.log                         # マスキング処理の置換ログ（件数・種別など）(.gitignore対象)
+├── mail_data/                         # マスク前の実メールデータ (.gitignore対象)
+│   ├── mail_data_001.txt 〜 mail_data_100.txt
+├── mail_mask/                         # 個人情報などマスク済みのメールデータ(.gitignore対象)
+│   ├── mail_mask_001.txt 〜 mail_mask_100.txt
+└── mail_morphological/                # 形態素解析済みのメールデータ (.gitignore対象)
+    ├── mail_morphological_001.txt 〜 mail_morphological_100.txt
 ```
 
 ## トラブルシューティング
@@ -141,6 +152,13 @@ mails/
 ### メールが取得できない場合
 - `DATE_SINCE`の日付形式が正しいか確認（DD-MMM-YYYY形式）
 - ネットワーク接続を確認
+
+## 参考資料・出典
+
+### 日本語ストップワード一覧
+- ファイル: `stopwords.txt`
+- 出典: https://github.com/stopwords-iso/stopwords-ja
+- 用途: 形態素解析後のストップワード除去処理で使用
 
 ## ライセンス
 
