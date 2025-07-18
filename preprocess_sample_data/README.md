@@ -1,24 +1,63 @@
-# Gmail IMAP メール取得ツール
+# メール前処理・データ準備ツール
 
-Gmail IMAPを使用してメールを取得し、ローカルにテキストファイルとして保存するPythonスクリプト。
+Gmail IMAPを使用してメールを取得し、マスク処理、形態素解析などの前処理を行うPythonスクリプト群。
+
+---
+
+## ディレクトリ構成
+
+```
+preprocess_sample_data/
+├── README.md                          # このファイル
+├── get_mail_imap.py*                  # GmailからメールをIMAP経由で取得するスクリプト
+├── mask_mail_texts.py*                # テキスト中の情報をマスク処理するスクリプト
+├── morphological_mail_texts.py*       # 形態素解析まわりを処理するスクリプト
+├── zip_mail_data.sh*                  # 元データを ZIP 圧縮するシェルスクリプト
+├── zip_mail_mask.sh*                  # マスクデータを ZIP 圧縮するシェルスクリプト
+├── config_sample                      # 公開用の設定テンプレート
+├── config                             # 実際の設定ファイル (.gitignore対象)
+├── stopwords.txt                      # 日本語ストップワード一覧
+├── masked.log                         # マスキング処理の置換ログ（件数・種別など）(.gitignore対象)
+├── mail_data/                         # マスク前の実メールデータ (.gitignore対象)
+│   ├── mail_data_001.txt 〜 mail_data_100.txt
+├── mail_mask/                         # 個人情報などマスク済みのメールデータ(.gitignore対象)
+│   ├── mail_mask_001.txt 〜 mail_mask_100.txt
+└── mail_morphological/                # 形態素解析済みのメールデータ (.gitignore対象)
+    ├── mail_morphological_001.txt 〜 mail_morphological_100.txt
+```
+
+## プロジェクト全体との関連
+
+このディレクトリは卒業研究プロジェクト「テキストマイニングによるメール本文の分類実験」の一部として、以下の役割を担っています：
+
+1. メールデータの取得と前処理
+2. 個人情報のマスク処理
+3. 形態素解析による単語分割
+
+処理済みデータは、プロジェクトのルートディレクトリにあるシンボリックリンク経由で他の処理モジュールからも参照できます：
+- `../shared_mail_mask` → `./mail_mask/`
+- `../shared_mail_morphological` → `./mail_morphological/`
 
 ## 機能
 
 - Gmail IMAPサーバーに接続してメールを取得
 - 指定した日付以降のメールをフィルタリング
-- 件名と本文をテキストファイルとして保存
+- 個人情報などをマスク処理
+- 形態素解析による単語分割と品詞タグ付け
+- ストップワード除去
 - 設定ファイルによる柔軟な設定管理
 
 ## 必要な環境
 
 - Python 3.6以上
 - 必要なライブラリ：
-  - `imapclient`
+  - `imapclient` (メール取得用)
+  - `janome` (形態素解析用)
 
 ## インストール
 
 ```bash
-$ pip install imapclient
+$ pip install imapclient janome
 ```
 
 ## 設定
@@ -127,22 +166,26 @@ python mask_mail_texts.py
 python morphological_mail_texts.py
 ```
 
-実行すると：
-1. 設定ファイルから認証情報を読み込み
-2. Gmail IMAPサーバーに接続
-3. 指定条件のメールを取得
-4. `SAVE_DIR`で指定したディレクトリに保存
+### 4. データ圧縮（必要に応じて）
+```bash
+./zip_mail_data.sh    # 元データを圧縮
+./zip_mail_mask.sh    # マスク済みデータを圧縮
+```
 
 ## 処理フロー
 
 ```
-Gmail → 生メール → マスク済み → 形態素解析済み
-       (SAVE_DIR) (MASKED_DIR) (MORPHOLOGICAL_DIR)
+1. Gmail (IMAP) → get_mail_imap.py → 生メール (SAVE_DIR)
+2. 生メール → mask_mail_texts.py → マスク済みメール (MASKED_DIR)
+3. マスク済みメール → morphological_mail_texts.py → 形態素解析済みメール (MORPHOLOGICAL_DIR)
+4. [オプション] 表記ゆれ正規化 → ../preprocess_fuzzy/normalize_text.py → 正規化済みテキスト
 ```
 
 ## 出力ファイル
 
-- ファイル名：`mail_001.txt`, `mail_002.txt`, ...
+- ファイル名：`mail_data_001.txt`, `mail_data_002.txt`, ...（生メール）
+- ファイル名：`mail_mask_001.txt`, `mail_mask_002.txt`, ...（マスク済み）
+- ファイル名：`mail_morphological_001.txt`, `mail_morphological_002.txt`, ...（形態素解析済み）
 - 形式：
   ```
   Subject: メールの件名
@@ -158,35 +201,9 @@ Gmail → 生メール → マスク済み → 形態素解析済み
 # for this project
 config
 *.log
-mails/
-```
-
-## 注意事項
-
-- Gmailの通常パスワードではなく、アプリパスワードを使用すること
-- `config`ファイルには機密情報が含まれるため、バージョン管理から除外すること
-- 大量のメール取得時はGmailのAPI制限に注意
-
-## ファイル構成
-
-```
-preprocess_sample_data/
-├── README.md                          # このファイル
-├── get_mail_imap.py*                  # GmailからメールをIMAP経由で取得するスクリプト
-├── mask_mail_texts.py*                # テキスト中の情報をマスク処理するスクリプト
-├── morphological_mail_texts.py*       # 形態素解析まわりを処理するスクリプト
-├── zip_mail_data.sh*                  # 元データを ZIP 圧縮するシェルスクリプト
-├── zip_mail_mask.sh*                  # マスクデータを ZIP 圧縮するシェルスクリプト
-├── config_sample                      # 公開用の設定テンプレート
-├── config                             # 実際の設定ファイル (.gitignore対象)
-├── stopwords.txt                      # 日本語ストップワード一覧
-├── masked.log                         # マスキング処理の置換ログ（件数・種別など）(.gitignore対象)
-├── mail_data/                         # マスク前の実メールデータ (.gitignore対象)
-│   ├── mail_data_001.txt 〜 mail_data_100.txt
-├── mail_mask/                         # 個人情報などマスク済みのメールデータ(.gitignore対象)
-│   ├── mail_mask_001.txt 〜 mail_mask_100.txt
-└── mail_morphological/                # 形態素解析済みのメールデータ (.gitignore対象)
-    ├── mail_morphological_001.txt 〜 mail_morphological_100.txt
+mail_data/
+mail_mask/
+mail_morphological/
 ```
 
 ## トラブルシューティング
@@ -198,6 +215,9 @@ preprocess_sample_data/
 ### メールが取得できない場合
 - `DATE_SINCE`の日付形式が正しいか確認（DD-MMM-YYYY形式）
 - ネットワーク接続を確認
+
+### マスク処理が不十分な場合
+- `mask_mail_texts.py`の正規表現パターンを確認・追加
 
 ## 参考資料・出典
 

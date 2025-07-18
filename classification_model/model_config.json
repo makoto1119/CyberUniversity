@@ -1,0 +1,35 @@
+{
+    "word2vec_params": {
+        "vector_size": 100,
+        "window": 5,
+        "min_count": 1,
+        "workers": 4
+    },
+    "tfidf_params": {
+        "max_features": 1000,
+        "min_df": 2,
+        "max_df": 0.95
+    },
+    "model_params": {
+        "logistic_regression": {
+            "max_iter": 1000
+        },
+        "test_size": 0.3
+    },
+    "input": {
+        "morphological_data_path": "../preprocess_sample_data/mail_morphological/*.txt",
+        "labels_file": "labels.csv"
+    },
+    "output": {
+        "word2vec": {
+            "model_path": "features_word2vec/word2vec.model",
+            "vectors_path": "features_word2vec"
+        },
+        "tfidf": {
+            "features_path": "features_tfidf"
+        },
+        "results": {
+            "evaluation": "results"
+        }
+    }
+}

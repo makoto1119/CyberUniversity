@@ -4,6 +4,8 @@ config
 mail_data/
 mail_mask/
 mail_morphological/
+features_word2vec/
+features_tfidf/
 old/
 tmp/
 
