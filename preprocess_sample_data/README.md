@@ -12,8 +12,6 @@ preprocess_sample_data/
 ├── get_mail_imap.py*                  # GmailからメールをIMAP経由で取得するスクリプト
 ├── mask_mail_texts.py*                # テキスト中の情報をマスク処理するスクリプト
 ├── morphological_mail_texts.py*       # 形態素解析まわりを処理するスクリプト
-├── zip_mail_data.sh*                  # 元データを ZIP 圧縮するシェルスクリプト
-├── zip_mail_mask.sh*                  # マスクデータを ZIP 圧縮するシェルスクリプト
 ├── config_sample                      # 公開用の設定テンプレート
 ├── config                             # 実際の設定ファイル (.gitignore対象)
 ├── stopwords.txt                      # 日本語ストップワード一覧
