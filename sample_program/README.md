@@ -9,7 +9,7 @@
 
 - 元リポジトリ: https://github.com/kujirahand/book-mlearn-gyomu
 - 書籍: 「Pythonによる AI・機械学習・深層学習アプリのつくり方」
-- 取得範囲: 第4章〜第6章のサンプルコード（ch4〜ch6）
+- 取得範囲: 第1章〜第6章のサンプルコード（ch1〜ch6）
 - 詳細な説明や使用方法については、元リポジトリのREADMEを参照してください
 
 ## ディレクトリ構成
@@ -17,13 +17,24 @@
 ```
 sample_program/
 ├── README.md                                     # 本ファイル
+├── ch1/                                          # 第1章: Jupyter Notebook入門
+│   └── about-jupyter-notebook.ipynb              # Jupyter Notebookの基本
+├── ch2/                                          # 第2章: 基礎的なデータ分析
+│   ├── and/                                      # 論理演算の学習
+│   ├── iris/                                     # アヤメデータの分析
+│   ├── select/                                   # アルゴリズム選択
+│   ├── tenki/                                    # 気温データの分析
+│   └── wine/                                     # ワインデータの分析
+├── ch3/                                          # 第3章: 画像処理と認識
+│   ├── cv2io/                                    # OpenCV基本操作
+│   ├── digits/                                   # 手書き数字認識
+│   ├── face/                                     # 顔認識
+│   ├── object/                                   # 物体検出
+│   ├── video/                                    # 動画処理
+│   └── zipno/                                    # 郵便番号認識
 ├── ch4/                                          # 第4章: 自然言語処理
 │   ├── Doc2Vec/                                  # Doc2Vec実装サンプル
 │   ├── Morphological_Analysis/                   # 形態素解析サンプル
-│   │   ├── Morphological_Analysis.py             # 基本的な形態素解析
-│   │   ├── Morphological_Analysis2.py            # NEologd辞書を使用した形態素解析
-│   │   ├── Morphological_Analysis3.py            # ストップワードの除去
-│   │   └── mecab-test.ipynb                      # Jupyter Notebook形式のMeCab動作確認
 │   ├── Word2Vec/                                 # Word2Vec実装サンプル
 │   ├── lang/                                     # 言語判定サンプル
 │   ├── markov/                                   # マルコフ連鎖サンプル

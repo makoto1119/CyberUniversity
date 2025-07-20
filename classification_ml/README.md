@@ -2,30 +2,29 @@
 
 形態素解析済みのメールテキストを使用して、Word2VecとTF-IDFによる文書ベクトル化と機械学習による分類を行い、その性能を比較するモジュール。
 
----
-
 ## ディレクトリ構成
 
 ```
-classification_model/
+./
 ├── README.md                          # このファイル
-├── run_evaluation.sh                  # 評価実行スクリプト
+├── run_classification.sh              # 分類実行スクリプト
 ├── model_config.json                  # モデルパラメータの設定
 ├── labels.csv                         # 文書カテゴリのラベルファイル
-├── models/                           # モデル関連のファイル
+├── models/                            # モデル関連のファイル
 │   ├── config_loader.py              # 設定ファイル読み込みクラス
-│   ├── generate_word2vec.py         # Word2Vecモデル学習と文書ベクトル生成
-│   ├── generate_tfidf.py            # TF-IDF特徴量生成
+│   ├── generate_word2vec.py          # Word2Vecモデル学習と文書ベクトル生成
+│   ├── generate_tfidf.py             # TF-IDF特徴量生成
 │   └── compare_features_and_models.py # 特徴量とモデルの比較
-├── features_word2vec/               # Word2Vec特徴量
-│   ├── word2vec.model              # 学習済みWord2Vecモデル
-│   └── *.json                      # 文書ベクトル
-├── features_tfidf/                 # TF-IDF特徴量
-│   └── *.json                      # TF-IDF特徴量
-├── results/                        # 評価結果
-│   ├── evaluation_summary.txt      # 評価結果のサマリー
-│   └── feature_model_comparison.csv # 特徴量とモデルの比較データ
-└── old/                           # 過去のバージョン（参考用）
+├── features_word2vec/                 # Word2Vec特徴量
+│   ├── word2vec.model                # 学習済みWord2Vecモデル
+│   └── *.json                        # 文書ベクトル
+├── features_tfidf/                    # TF-IDF特徴量
+│   ├── tfidf_vectorizer.pkl          # TF-IDFベクトライザーモデル
+│   └── *.json                        # TF-IDF特徴量
+├── results/                           # 評価結果
+│   ├── evaluation_summary.txt         # 評価結果のサマリー
+│   └── feature_model_comparison.csv   # 特徴量とモデルの比較データ
+└── old/                              # 過去のバージョン（参考用）
 ```
 
 ## プロジェクト構造の詳細
@@ -33,9 +32,8 @@ classification_model/
 ### models/
 - `config_loader.py`: JSONファイルからモデルの設定を読み込むためのユーティリティクラス
 - `generate_word2vec.py`: Word2Vecモデルの学習と文書ベクトル生成を行う
-- `generate_tfidf.py`: TF-IDFベクトル生成を行う
+- `generate_tfidf.py`: TF-IDF特徴量生成を行う
 - `compare_features_and_models.py`: 各特徴量と分類モデルの組み合わせで性能評価を行う
-- `visualize_results.py`: 評価結果の可視化を行う
 
 ### features_word2vec/
 Word2Vec関連のファイルを格納：
@@ -44,6 +42,7 @@ Word2Vec関連のファイルを格納：
 
 ### features_tfidf/
 TF-IDF関連のファイルを格納：
+- `tfidf_vectorizer.pkl`: 学習済みのTF-IDFベクトライザー
 - `*.json`: 各文書のTF-IDFベクトル（文書ID.json）
 
 ### results/
@@ -51,14 +50,51 @@ TF-IDF関連のファイルを格納：
 - `evaluation_summary.txt`: 全モデルの評価指標
 - `feature_model_comparison.csv`: 特徴量とモデルの組み合わせごとの性能データ
 
-## 機能
+## 設定ファイル（model_config.json）
 
-- 形態素解析済みテキストからWord2Vecモデルの学習
-- TF-IDFによる特徴量生成
-- 文書ごとの特徴ベクトル（文書ベクトル）の生成
-- ロジスティック回帰による文書分類
-- 分類性能の評価（F1スコアなど）
-- 特徴量手法の比較
+### 入力データの設定
+model_config.jsonで入力データのソースを指定できます：
+
+```json
+{
+    "input": {
+        "data_source": "fuzzy",  // "fuzzy" または "tokenize" を指定
+        "data_paths": {
+            "fuzzy": "../shared_texts_fuzzy/*.txt",
+            "tokenize": "../shared_texts_tokenize/*.txt"
+        },
+        "labels_file": "labels.csv"
+    }
+}
+```
+
+- `data_source`: 使用するデータソースを指定（"fuzzy" または "tokenize"）
+- `data_paths`: 各データソースのファイルパスを定義
+  - `fuzzy`: ファジー検索用のテキストファイル
+  - `tokenize`: 形態素解析済みのテキストファイル
+
+### その他の設定パラメータ
+```json
+{
+    "word2vec_params": {
+        "vector_size": 100,
+        "window": 5,
+        "min_count": 1,
+        "workers": 4
+    },
+    "tfidf_params": {
+        "max_features": 1000,
+        "min_df": 2,
+        "max_df": 0.95
+    },
+    "model_params": {
+        "logistic_regression": {
+            "max_iter": 1000
+        },
+        "test_size": 0.3
+    }
+}
+```
 
 ## 必要な環境
 
@@ -75,20 +111,17 @@ TF-IDF関連のファイルを格納：
 $ pip install gensim scikit-learn numpy pandas
 ```
 
-## 処理フロー
-
-```
-1. 形態素解析済みテキスト → generate_word2vec.py → Word2Vecモデル + 文書ベクトル
-2. 形態素解析済みテキスト → generate_tfidf.py → TF-IDF特徴量
-3. 特徴量 + ラベル → compare_features_and_models.py → 分類結果 + 評価指標
-```
-
 ## 使用方法
+
+### データソースの切り替え
+1. model_config.jsonの`data_source`を変更：
+   - ファジー検索用テキスト: `"data_source": "fuzzy"`
+   - 形態素解析済みテキスト: `"data_source": "tokenize"`
 
 ### すべての評価を実行
 
 ```bash
-./run_evaluation.sh
+./run_classification.sh
 ```
 
 ### 個別に実行する場合
@@ -111,27 +144,15 @@ python models/compare_features_and_models.py
 ## 入出力ファイル
 
 ### 入力
-- 形態素解析済みテキスト: `../shared_mail_morphological/*.txt`
+- テキストファイル: model_config.jsonの`data_paths`で指定されたパス
 - ラベルファイル: `./labels.csv` (形式: ファイル名,カテゴリ)
 
 ### 出力
 - Word2Vecモデル: `./features_word2vec/word2vec.model`
 - Word2Vec文書ベクトル: `./features_word2vec/*.json`
+- TF-IDFベクトライザー: `./features_tfidf/tfidf_vectorizer.pkl`
 - TF-IDF特徴量: `./features_tfidf/*.json`
 - 分類結果と評価指標: `./results/evaluation_summary.txt`
-
-## 特徴量生成パラメータ
-
-### Word2Vec
-- `vector_size`: 100 (ベクトルの次元数)
-- `window`: 5 (コンテキストウィンドウサイズ)
-- `min_count`: 1 (出現回数の最小値)
-- `workers`: 4 (並列処理数)
-
-### TF-IDF
-- `max_features`: 1000 (使用する特徴量の数)
-- `min_df`: 2 (最小文書頻度)
-- `max_df`: 0.95 (最大文書頻度)
 
 ## 文書ベクトル化手法
 

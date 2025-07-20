@@ -17,7 +17,11 @@
         "test_size": 0.3
     },
     "input": {
-        "morphological_data_path": "../preprocess_sample_data/mail_morphological/*.txt",
+        "data_source": "fuzzy",
+        "data_paths": {
+            "fuzzy": "../shared_texts_fuzzy/*.txt",
+            "tokenize": "../shared_texts_tokenize/*.txt"
+        },
         "labels_file": "labels.csv"
     },
     "output": {

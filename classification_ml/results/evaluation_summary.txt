@@ -1,0 +1,135 @@
+=== メール分類モデル評価結果 ===
+
+
+Word2Vec + LogisticRegression
+----------------------------------------
+F1スコア: 0.3733
+
+分類レポート:
+               precision    recall  f1-score   support
+
+engineer_info       0.67      0.12      0.20        17
+ project_info       0.44      0.92      0.60        13
+
+     accuracy                           0.47        30
+    macro avg       0.56      0.52      0.40        30
+ weighted avg       0.57      0.47      0.37        30
+
+----------------------------------------
+
+Word2Vec + SVM
+----------------------------------------
+F1スコア: 0.2620
+
+分類レポート:
+               precision    recall  f1-score   support
+
+engineer_info       0.00      0.00      0.00        17
+ project_info       0.43      1.00      0.60        13
+
+     accuracy                           0.43        30
+    macro avg       0.22      0.50      0.30        30
+ weighted avg       0.19      0.43      0.26        30
+
+----------------------------------------
+
+Word2Vec + RandomForest
+----------------------------------------
+F1スコア: 0.3821
+
+分類レポート:
+               precision    recall  f1-score   support
+
+engineer_info       0.50      0.18      0.26        17
+ project_info       0.42      0.77      0.54        13
+
+     accuracy                           0.43        30
+    macro avg       0.46      0.47      0.40        30
+ weighted avg       0.46      0.43      0.38        30
+
+----------------------------------------
+
+Word2Vec + NaiveBayes
+----------------------------------------
+F1スコア: 0.5155
+
+分類レポート:
+               precision    recall  f1-score   support
+
+engineer_info       0.57      0.71      0.63        17
+ project_info       0.44      0.31      0.36        13
+
+     accuracy                           0.53        30
+    macro avg       0.51      0.51      0.50        30
+ weighted avg       0.52      0.53      0.52        30
+
+----------------------------------------
+
+TF-IDF + LogisticRegression
+----------------------------------------
+F1スコア: 0.3311
+
+分類レポート:
+               precision    recall  f1-score   support
+
+engineer_info       0.40      0.12      0.18        17
+ project_info       0.40      0.77      0.53        13
+
+     accuracy                           0.40        30
+    macro avg       0.40      0.44      0.35        30
+ weighted avg       0.40      0.40      0.33        30
+
+----------------------------------------
+
+TF-IDF + SVM
+----------------------------------------
+F1スコア: 0.3311
+
+分類レポート:
+               precision    recall  f1-score   support
+
+engineer_info       0.40      0.12      0.18        17
+ project_info       0.40      0.77      0.53        13
+
+     accuracy                           0.40        30
+    macro avg       0.40      0.44      0.35        30
+ weighted avg       0.40      0.40      0.33        30
+
+----------------------------------------
+
+TF-IDF + RandomForest
+----------------------------------------
+F1スコア: 0.3821
+
+分類レポート:
+               precision    recall  f1-score   support
+
+engineer_info       0.50      0.18      0.26        17
+ project_info       0.42      0.77      0.54        13
+
+     accuracy                           0.43        30
+    macro avg       0.46      0.47      0.40        30
+ weighted avg       0.46      0.43      0.38        30
+
+----------------------------------------
+
+TF-IDF + NaiveBayes
+----------------------------------------
+F1スコア: 0.3688
+
+分類レポート:
+               precision    recall  f1-score   support
+
+engineer_info       0.44      0.41      0.42        17
+ project_info       0.29      0.31      0.30        13
+
+     accuracy                           0.37        30
+    macro avg       0.36      0.36      0.36        30
+ weighted avg       0.37      0.37      0.37        30
+
+----------------------------------------
+
+=== 最良モデル ===
+特徴量: Word2Vec
+モデル: NaiveBayes
+F1スコア: 0.5155

@@ -31,7 +31,9 @@ def main():
     tfidf_params = config.get_tfidf_params()
     
     # 入出力パスの設定
-    input_dir = Path(paths["input"]["morphological_data_path"].replace("*.txt", ""))
+    data_source = paths["input"]["data_source"]
+    input_path = paths["input"]["data_paths"][data_source]
+    input_dir = Path(input_path.replace("*.txt", ""))
     output_dir = Path(paths["output"]["tfidf"]["features_path"])
     output_dir.mkdir(parents=True, exist_ok=True)
     

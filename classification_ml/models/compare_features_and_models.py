@@ -21,14 +21,32 @@ def load_vectors(vec_dir):
     """ベクトルデータを読み込む"""
     vectors = []
     filenames = []
+    
+    # まず全てのベクトルを読み込む
     for path in sorted(vec_dir.glob("*.json")):
         # モデルファイルを除外
         if not path.name.endswith(".pkl") and not path.name.endswith(".model"):
             with path.open(encoding="utf-8") as f:
                 vec = json.load(f)
-                vectors.append(vec)
-                filenames.append(path.stem)
-    return np.array(vectors), filenames
+                if isinstance(vec, list):  # ベクトルがリスト形式であることを確認
+                    vectors.append(vec)
+                    filenames.append(path.stem)
+    
+    if not vectors:
+        return np.array([]), []
+    
+    # 全てのベクトルを同じ次元数にする
+    max_dim = max(len(vec) for vec in vectors)
+    padded_vectors = []
+    for vec in vectors:
+        if len(vec) < max_dim:
+            # 不足している次元を0で埋める
+            padded_vec = vec + [0.0] * (max_dim - len(vec))
+            padded_vectors.append(padded_vec)
+        else:
+            padded_vectors.append(vec)
+    
+    return np.array(padded_vectors), filenames
 
 def load_labels(label_file):
     """ラベルデータを読み込む"""
@@ -64,7 +82,8 @@ def evaluate_model(model, X_train, X_test, y_train, y_test, model_name, feature_
         'report': report,
         'f1_score': f1,
         'confusion_matrix': cm,
-        'y_pred': y_pred
+        'y_pred': y_pred,
+        'y_test': y_test  # 評価サマリー用に正解ラベルも保存
     }
 
 def save_results_to_csv(results, output_dir):
@@ -101,7 +120,7 @@ def save_evaluation_summary(results, output_dir):
             f.write(f"F1スコア: {r['f1_score']:.4f}\n\n")
             f.write("分類レポート:\n")
             # 分類レポートを文字列形式で取得
-            report = classification_report(r['y_pred'], r['y_pred'])
+            report = classification_report(r['y_test'], r['y_pred'])
             f.write(report + "\n")
             f.write("-" * 40 + "\n")
         
@@ -160,7 +179,12 @@ def process_feature_set(feature_dir, feature_name, label_map, output_dir):
     
     # 特徴量とラベルの読み込み
     X, filenames = load_vectors(feature_dir)
-    y = [label_map.get(name, "unknown") for name in filenames]
+    
+    if len(X) == 0:
+        print(f"エラー: {feature_name}の有効なデータがありません。")
+        return []
+        
+    y = [label_map.get(name + ".txt", "unknown") for name in filenames]
     
     # ラベルが設定されていないデータを除外
     valid_indices = [i for i, label in enumerate(y) if label != "unknown"]

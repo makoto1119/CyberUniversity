@@ -42,7 +42,9 @@ def main():
     word2vec_params = config.get_word2vec_params()
 
     # 入出力パスの設定
-    input_dir = Path(paths["input"]["morphological_data_path"].replace("*.txt", ""))
+    data_source = paths["input"]["data_source"]
+    input_path = paths["input"]["data_paths"][data_source]
+    input_dir = Path(input_path.replace("*.txt", ""))
     output_dir = Path(paths["output"]["word2vec"]["vectors_path"])
     model_path = Path(paths["output"]["word2vec"]["model_path"])
 

@@ -1,0 +1,41 @@
+{
+    "process_input": {
+        "value": {
+            "tokenize": "../shared_mail_mask",
+            "fuzzy": "texts_tokenize"
+        },
+        "description": "各処理の入力元ディレクトリ"
+    },
+    "process_output": {
+        "value": {
+            "tokenize": "texts_tokenize",
+            "fuzzy": "texts_fuzzy"
+        },
+        "description": "各処理の出力先ディレクトリ"
+    },
+    "fuzzy_patterns_file": {
+        "value": "fuzzy_patterns.json",
+        "description": "正規化パターン定義ファイル"
+    },
+    "stopwords_file": {
+        "value": "stopwords.txt",
+        "description": "ストップワード定義ファイル"
+    },
+    "default_pos_filter": {
+        "value": ["名詞", "動詞", "形容詞"],
+        "description": "デフォルトの品詞フィルター"
+    },
+    "tokenize_params": {
+        "value": {
+            "enable_base_form": true
+        },
+        "description": "形態素解析の追加パラメータ"
+    },
+    "normalize_params": {
+        "value": {
+            "enable_number_normalize": true,
+            "enable_kana_normalize": true
+        },
+        "description": "正規化処理の追加パラメータ"
+    }
+}

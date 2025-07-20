@@ -3,7 +3,7 @@ import os
 from typing import Dict, Any
 
 class ConfigLoader:
-    def __init__(self, config_path: str = "../classification_model/model_config.json"):
+    def __init__(self, config_path: str = "model_config.json"):
         """設定ファイルを読み込むためのローダークラス
 
         Args:
