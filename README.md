@@ -28,8 +28,8 @@
 │   │   ├── generate_tfidf.py                # TF-IDF特徴量生成スクリプト
 │   │   └── generate_word2vec.py             # Word2Vec特徴量生成スクリプト
 │   ├── results/                             # 評価結果
-│   │   ├── evaluation_summary.txt           # 評価結果のサマリーレポート
-│   │   └── feature_model_comparison.csv     # 特徴量・モデル別の性能比較データ
+│   │   ├── sample_evaluation_summary.txt    # サンプル用の評価結果サマリーレポート
+│   │   └── sample_feature_comparison.csv    # サンプル用の特徴量・性能比較データ
 │   └── run_evaluation.sh*                   # 評価実行スクリプト
 ├── preprocess_nlp/                          # 自然言語処理（形態素解析・表記ゆれ）ツール
 │   ├── README.md                            # 処理の詳細説明
@@ -83,6 +83,8 @@ texts_fuzzy/
 texts_tokenize/
 features_word2vec/
 features_tfidf/
+evaluation_summary.txt
+feature_model_comparison.csv
 old/
 tmp/
 

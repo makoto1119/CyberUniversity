@@ -51,17 +51,17 @@ engineer_info       0.50      0.18      0.26        17
 
 Word2Vec + NaiveBayes
 ----------------------------------------
-F1スコア: 0.5155
+F1スコア: 0.4593
 
 分類レポート:
                precision    recall  f1-score   support
 
-engineer_info       0.57      0.71      0.63        17
- project_info       0.44      0.31      0.36        13
+engineer_info       0.53      0.59      0.56        17
+ project_info       0.36      0.31      0.33        13
 
-     accuracy                           0.53        30
-    macro avg       0.51      0.51      0.50        30
- weighted avg       0.52      0.53      0.52        30
+     accuracy                           0.47        30
+    macro avg       0.44      0.45      0.44        30
+ weighted avg       0.46      0.47      0.46        30
 
 ----------------------------------------
 
@@ -99,17 +99,17 @@ engineer_info       0.40      0.12      0.18        17
 
 TF-IDF + RandomForest
 ----------------------------------------
-F1スコア: 0.3821
+F1スコア: 0.3517
 
 分類レポート:
                precision    recall  f1-score   support
 
-engineer_info       0.50      0.18      0.26        17
- project_info       0.42      0.77      0.54        13
+engineer_info       0.40      0.24      0.30        17
+ project_info       0.35      0.54      0.42        13
 
-     accuracy                           0.43        30
-    macro avg       0.46      0.47      0.40        30
- weighted avg       0.46      0.43      0.38        30
+     accuracy                           0.37        30
+    macro avg       0.38      0.39      0.36        30
+ weighted avg       0.38      0.37      0.35        30
 
 ----------------------------------------
 
@@ -132,4 +132,4 @@ engineer_info       0.44      0.41      0.42        17
 === 最良モデル ===
 特徴量: Word2Vec
 モデル: NaiveBayes
-F1スコア: 0.5155
+F1スコア: 0.4593

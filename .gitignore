@@ -7,6 +7,8 @@ texts_fuzzy/
 texts_tokenize/
 features_word2vec/
 features_tfidf/
+evaluation_summary.txt
+feature_model_comparison.csv
 old/
 tmp/
 
