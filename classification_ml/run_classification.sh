@@ -27,25 +27,39 @@ echo "----------------------------------------"
 echo "1. Word2Vec特徴量の生成"
 echo "実行: python models/generate_word2vec.py"
 echo "----------------------------------------"
-python models/generate_word2vec.py
+if ! python models/generate_word2vec.py; then
+    echo "エラー: Word2Vec特徴量の生成に失敗しました"
+    exit 1
+fi
 echo
 
 echo "----------------------------------------"
 echo "2. TF-IDF特徴量の生成"
 echo "実行: python models/generate_tfidf.py"
 echo "----------------------------------------"
-python models/generate_tfidf.py
+if ! python models/generate_tfidf.py; then
+    echo "エラー: TF-IDF特徴量の生成に失敗しました"
+    exit 1
+fi
 echo
 
 echo "----------------------------------------"
 echo "3. 特徴量とモデルの比較"
 echo "実行: python models/compare_features_and_models.py"
 echo "----------------------------------------"
-python models/compare_features_and_models.py
+if ! python models/compare_features_and_models.py; then
+    echo "エラー: 特徴量とモデルの比較に失敗しました"
+    exit 1
+fi
 echo
 
 echo "===== 評価完了 ====="
 echo "結果は ./results ディレクトリに保存されました"
 echo "評価結果サマリー: ./results/evaluation_summary.txt"
 echo "特徴量とモデルの比較: ./results/feature_model_comparison.csv"
+if [ -f "./results/classification_history.csv" ]; then
+    echo "実験履歴: ./results/classification_history.csv"
+else
+    echo "警告: 実験履歴ファイル (classification_history.csv) が生成されませんでした"
+fi
 echo "----------------------------------------"

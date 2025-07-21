@@ -9,6 +9,7 @@ import json
 import numpy as np
 import pandas as pd
 from pathlib import Path
+from datetime import datetime
 from sklearn.model_selection import cross_val_score, GridSearchCV, train_test_split
 from sklearn.metrics import classification_report, confusion_matrix, f1_score
 from sklearn.linear_model import LogisticRegression
@@ -107,6 +108,72 @@ def save_results_to_csv(results, output_dir):
     
     df = pd.DataFrame(data)
     df.to_csv(output_dir / 'feature_model_comparison.csv', index=False)
+
+def save_history(best_result, config, output_dir):
+    """最良の結果を履歴として保存"""
+    # 出力ディレクトリが存在することを確認
+    output_dir.mkdir(parents=True, exist_ok=True)
+    
+    history_file = output_dir / 'classification_history.csv'
+    now = datetime.now()
+    
+    # 入力データ種別を取得
+    data_source = config.get_paths()["input"]["data_source"]
+    
+    # モデルのパラメータを取得
+    model_params = config.get_model_params()
+    test_size = model_params.get('test_size', 0.3)  # デフォルト値として0.3を使用
+    
+    # 全データ数を計算
+    total_samples = int(len(best_result['y_test']) / test_size)
+    
+    # 特徴量の種類に応じたパラメータを取得
+    feature_params = ""
+    if best_result['feature_name'] == "Word2Vec":
+        w2v_params = config.get_word2vec_params()
+        feature_params = f"vec_size={w2v_params['vector_size']},window={w2v_params['window']},min_count={w2v_params['min_count']}"
+    elif best_result['feature_name'] == "TF-IDF":
+        tfidf_params = config.get_tfidf_params()
+        feature_params = f"max_feat={tfidf_params['max_features']},min_df={tfidf_params['min_df']},max_df={tfidf_params['max_df']}"
+    
+    # クラス数を計算
+    unique_classes = set(best_result['y_test'])
+    num_classes = len(unique_classes)
+    
+    # 新しい結果の行を作成
+    new_row = {
+        '日付': now.strftime('%Y-%m-%d'),
+        '時間': now.strftime('%H:%M:%S'),
+        '特徴量手法': best_result['feature_name'],
+        '分類モデル': best_result['model_name'],
+        '入力データ種別': data_source,
+        'サンプル数': total_samples,
+        'テストデータ比率': f"{test_size:.2f}",
+        '特徴量パラメータ': feature_params,
+        'ストップワード設定': 'なし',  # 現在の実装では未対応
+        'ゆらぎ補正': 'なし',  # 現在の実装では未対応
+        'F1スコア': f"{best_result['f1_score']:.4f}",
+        'クラス数': num_classes,
+        '備考・変更点': ''
+    }
+    
+    # CSVファイルが存在する場合は追記、存在しない場合は新規作成
+    columns = [
+        '日付', '時間', '特徴量手法', '分類モデル', '入力データ種別',
+        'サンプル数', 'テストデータ比率', '特徴量パラメータ',
+        'ストップワード設定', 'ゆらぎ補正', 'F1スコア', 'クラス数',
+        '備考・変更点'
+    ]
+    
+    if history_file.exists():
+        df = pd.read_csv(history_file)
+        df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+    else:
+        df = pd.DataFrame([new_row], columns=columns)
+    
+    # CSVファイルに保存（カラム順序を維持）
+    df.to_csv(history_file, index=False, columns=columns)
+    print(f"\n履歴が {history_file} に保存されました")
 
 def save_evaluation_summary(results, output_dir):
     """評価結果のサマリーをテキストファイルに保存"""
@@ -285,6 +352,9 @@ def main():
     print("="*50)
     print(f"最良のモデル: {best_result['feature_name']} + {best_result['model_name']}")
     print(f"F1スコア: {best_result['f1_score']:.4f}")
+    
+    # 履歴の保存
+    save_history(best_result, config, results_dir)
     
     print("\n" + "-"*50)
     print(f"結果は {results_dir} ディレクトリに保存されました")

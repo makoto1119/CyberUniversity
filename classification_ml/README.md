@@ -23,7 +23,8 @@
 │   └── *.json                        # TF-IDF特徴量
 ├── results/                           # 評価結果
 │   ├── evaluation_summary.txt         # 評価結果のサマリー
-│   └── feature_model_comparison.csv   # 特徴量とモデルの比較データ
+│   ├── feature_model_comparison.csv   # 特徴量とモデルの比較データ
+│   └── classification_history.csv     # 実験結果の履歴データ
 └── old/                              # 過去のバージョン（参考用）
 ```
 
