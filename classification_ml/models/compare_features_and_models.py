@@ -23,15 +23,23 @@ def load_vectors(vec_dir):
     vectors = []
     filenames = []
     
+    print(f"\nベクトルデータの読み込みを開始: {vec_dir}")
+    
     # まず全てのベクトルを読み込む
     for path in sorted(vec_dir.glob("*.json")):
         # モデルファイルを除外
         if not path.name.endswith(".pkl") and not path.name.endswith(".model"):
+            print(f"処理中のファイル: {path.name}")  # デバッグ出力
             with path.open(encoding="utf-8") as f:
                 vec = json.load(f)
                 if isinstance(vec, list):  # ベクトルがリスト形式であることを確認
                     vectors.append(vec)
-                    filenames.append(path.stem)
+                    # 拡張子を除いたファイル名を保存
+                    base_name = path.stem
+                    filenames.append(base_name)
+                    print(f"読み込み成功: {base_name}")  # デバッグ出力
+    
+    print(f"\n合計で{len(vectors)}個のベクトルを読み込みました")
     
     if not vectors:
         return np.array([]), []
@@ -140,9 +148,12 @@ def save_history(best_result, config, output_dir):
     unique_classes = set(best_result['y_test'])
     num_classes = len(unique_classes)
     
-    # stopwords設定の取得と確認
+    # stopwordsとゆらぎ処理の設定を取得
     stopwords_enabled = config.get_stopwords_enabled()
-    print(f"\n保存時のstopwords設定: {'あり' if stopwords_enabled else 'なし'}")
+    normalize_enabled = config.get_normalize_enabled()
+    print(f"\n保存時の設定:")
+    print(f"- stopwords設定: {'あり' if stopwords_enabled else 'なし'}")
+    print(f"- ゆらぎ処理: {'あり' if normalize_enabled else 'なし'}")
     
     # 新しい結果の行を作成
     new_row = {
@@ -155,7 +166,7 @@ def save_history(best_result, config, output_dir):
         'テストデータ比率': f"{test_size:.2f}",
         '特徴量パラメータ': feature_params,
         'ストップワード設定': 'あり' if stopwords_enabled else 'なし',
-        'ゆらぎ補正': 'なし',  # 現在の実装では未対応
+        'ゆらぎ補正': 'あり' if normalize_enabled else 'なし',
         'F1スコア': f"{best_result['f1_score']:.4f}",
         'クラス数': num_classes,
         '備考・変更点': ''
@@ -254,13 +265,31 @@ def process_feature_set(feature_dir, feature_name, label_map, output_dir):
     if len(X) == 0:
         print(f"エラー: {feature_name}の有効なデータがありません。")
         return []
+    
+    print("\nデバッグ情報:")
+    print(f"読み込んだファイル数: {len(filenames)}")
+    print(f"最初の5つのファイル名: {filenames[:5]}")
+    print(f"ラベルマップのエントリ数: {len(label_map)}")
+    print(f"ラベルマップの最初の5つのエントリ: {dict(list(label_map.items())[:5])}")
         
-    y = [label_map.get(name + ".txt", "unknown") for name in filenames]
+    y = []
+    for name in filenames:
+        # 元のファイル名をそのまま使用（.txtを付加）
+        label = label_map.get(f"{name}.txt", "unknown")
+        y.append(label)
+    
+    # デバッグ: マッチしなかったファイル名を表示
+    unmatched_files = [(name, name + ".txt") for i, name in enumerate(filenames) if y[i] == "unknown"]
+    if unmatched_files:
+        print("\nラベルが見つからなかったファイル（最初の5件）:")
+        for orig_name, search_name in unmatched_files[:5]:
+            print(f"元のファイル名: {orig_name}")
+            print(f"検索したキー: {search_name}")
     
     # ラベルが設定されていないデータを除外
     valid_indices = [i for i, label in enumerate(y) if label != "unknown"]
     if len(valid_indices) < len(y):
-        print(f"警告: {len(y) - len(valid_indices)}件のファイルにラベルが設定されていません。これらは除外されます。")
+        print(f"\n警告: {len(y) - len(valid_indices)}件のファイルにラベルが設定されていません。これらは除外されます。")
         X = X[valid_indices]
         y = [y[i] for i in valid_indices]
         filenames = [filenames[i] for i in valid_indices]

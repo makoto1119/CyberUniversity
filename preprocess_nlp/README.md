@@ -139,6 +139,42 @@ python tokenize_texts.py --indir ../shared_mail_mask --outdir texts_tokenize
 
 ## テキスト正規化処理（fuzzy_normalize.py）
 
+### 正規化の処理順序
+
+正規化処理は以下の順序で実行されます：
+
+1. 技術用語の保護（technical_terms.jsonを使用）
+   - 定義された技術用語を一時的なプレースホルダーに置換
+   - カタカナの正規化から保護するため
+
+2. 数字の正規化
+   - 全角数字を半角数字に変換
+   - 例：「１２３」→「123」
+
+3. カタカナのひらがな化
+   - カタカナをひらがなに変換
+   - 例：「コンピュータ」→「こんぴゅーた」
+   - ただし、technical_terms.jsonで定義された用語は変換されない
+
+4. パターンによる正規化（fuzzy_patterns.jsonを使用）
+   - 定義された置換パターンに基づいて文字列を変換
+   - 例：「でございます」→「です」
+   - 敬語表現の統一なども含む
+
+5. 保護した技術用語の復元
+   - 手順1で置換した技術用語を元に戻す
+   - カタカナのまま保持される
+
+これらの処理は preprocess_config.json の normalize_params で制御できます：
+```json
+"normalize_params": {
+    "value": {
+        "enable_number_normalize": true,
+        "enable_kana_normalize": true
+    }
+}
+```
+
 ### 基本的な使い方
 
 ```bash

@@ -86,7 +86,7 @@ def main():
         with outpath.open("w", encoding="utf-8") as f:
             json.dump(vec.tolist(), f, ensure_ascii=False, indent=2)
 
-    print(f"完了: {len(vectors)}件の文書ベクトルを生成")
+    print(f"Word2Vec: {len(vectors)}件の文書ベクトルを生成しました")
 
 if __name__ == "__main__":
     main()

@@ -94,3 +94,15 @@ class ConfigLoader:
             return self.preprocess_config.get('tokenize_params', {}).get('value', {}).get('enable_stopwords', False)
         except (AttributeError, KeyError):
             return False
+    def get_normalize_enabled(self) -> bool:
+        """前処理設定からゆらぎ処理の有効/無効を取得
+
+        Returns:
+            bool: 数値正規化または仮名正規化が有効な場合True
+        """
+        try:
+            normalize_params = self.preprocess_config.get('normalize_params', {}).get('value', {})
+            return normalize_params.get('enable_number_normalize', False) or \
+                   normalize_params.get('enable_kana_normalize', False)
+        except (AttributeError, KeyError):
+            return False

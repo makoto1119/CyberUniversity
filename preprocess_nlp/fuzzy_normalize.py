@@ -17,8 +17,28 @@ def load_patterns(json_path):
     with open(json_path, encoding='utf-8') as f:
         return json.load(f)
 
+def load_technical_terms(json_path='technical_terms.json'):
+    """技術用語リストを読み込む"""
+    try:
+        with open(json_path, encoding='utf-8') as f:
+            return set(json.load(f)['protected_terms'])
+    except FileNotFoundError:
+        print(f"警告: 技術用語リストファイル {json_path} が見つかりません")
+        return set()
+
 def normalize_text(text, patterns, params):
     """テキストを正規化する"""
+    # 技術用語リストの読み込み
+    tech_terms = load_technical_terms()
+    
+    # 技術用語を一時的にプレースホルダーに置換
+    placeholder_map = {}
+    for i, term in enumerate(tech_terms):
+        if term in text:
+            placeholder = f"__TECH_TERM_{i}__"
+            text = text.replace(term, placeholder)
+            placeholder_map[placeholder] = term
+    
     # 数字の正規化
     if params.get('enable_number_normalize', True):
         for half, full in zip('0123456789', '０１２３４５６７８９'):
@@ -32,6 +52,10 @@ def normalize_text(text, patterns, params):
     for standard, variants in patterns.items():
         for variant in variants:
             text = text.replace(variant, standard)
+    
+    # プレースホルダーを元の技術用語に戻す
+    for placeholder, term in placeholder_map.items():
+        text = text.replace(placeholder, term)
     
     return text
 

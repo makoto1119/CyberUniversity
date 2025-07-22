@@ -69,7 +69,7 @@ def main():
         with outpath.open("w", encoding="utf-8") as f:
             json.dump(vec.tolist(), f, ensure_ascii=False, indent=2)
     
-    print(f"TF-IDF特徴量を {output_dir} に保存しました。")
+    print(f"TF-IDF: {X.shape[0]}件の文書ベクトルを生成しました")
 
 if __name__ == "__main__":
     main()
