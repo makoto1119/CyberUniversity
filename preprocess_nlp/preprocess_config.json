@@ -27,7 +27,8 @@
     },
     "tokenize_params": {
         "value": {
-            "enable_base_form": true
+            "enable_base_form": true,
+            "enable_stopwords": true
         },
         "description": "形態素解析の追加パラメータ"
     },

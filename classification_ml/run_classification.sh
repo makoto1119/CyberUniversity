@@ -57,8 +57,11 @@ echo "===== 評価完了 ====="
 echo "結果は ./results ディレクトリに保存されました"
 echo "評価結果サマリー: ./results/evaluation_summary.txt"
 echo "特徴量とモデルの比較: ./results/feature_model_comparison.csv"
+echo ""
 if [ -f "./results/classification_history.csv" ]; then
     echo "実験履歴: ./results/classification_history.csv"
+    head -1 ./results/classification_history.csv
+    tail -3 ./results/classification_history.csv
 else
     echo "警告: 実験履歴ファイル (classification_history.csv) が生成されませんでした"
 fi

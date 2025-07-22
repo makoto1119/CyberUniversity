@@ -21,7 +21,7 @@ def get_number_from_filename(filename):
     match = re.search(r'(\d+)', filename)
     return int(match.group(1)) if match else 0
 
-def process_file(input_file, output_file, stopwords, pos_filter):
+def process_file(input_file, output_file, stopwords, pos_filter, enable_stopwords=True):
     """単一ファイルの形態素解析を行う"""
     tokenizer = Tokenizer()
     
@@ -31,16 +31,17 @@ def process_file(input_file, output_file, stopwords, pos_filter):
     tokens = []
     for token in tokenizer.tokenize(text):
         if any(pos in token.part_of_speech for pos in pos_filter):
-            if token.base_form not in stopwords:
+            # ストップワードチェックを表層形で行う
+            if not enable_stopwords or (token.surface not in stopwords and token.base_form not in stopwords):
                 tokens.append(token.base_form)
     
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
     with open(output_file, 'w', encoding='utf-8') as f:
         f.write(' '.join(tokens))
 
-def process_directory(input_dir, output_dir, stopwords_file, pos_filter):
+def process_directory(input_dir, output_dir, stopwords_file, pos_filter, enable_stopwords=True):
     """ディレクトリ内の全ファイルを処理"""
-    stopwords = load_stopwords(stopwords_file)
+    stopwords = load_stopwords(stopwords_file) if enable_stopwords else set()
     
     input_path = Path(input_dir)
     output_path = Path(output_dir)
@@ -56,7 +57,7 @@ def process_directory(input_dir, output_dir, stopwords_file, pos_filter):
     for i, input_file in enumerate(input_files, 1):
         output_file = output_path / f'texts_tokenize_{i:03d}.txt'
         print(f"Processing: {input_file} -> {output_file}")
-        process_file(str(input_file), str(output_file), stopwords, pos_filter)
+        process_file(str(input_file), str(output_file), stopwords, pos_filter, enable_stopwords)
 
 def main():
     parser = argparse.ArgumentParser(description='テキストの形態素解析を行います')
@@ -70,6 +71,8 @@ def main():
                       help='ストップワードファイルのパス（設定ファイルの値を上書き）')
     parser.add_argument('--pos-filter',
                       help='抽出する品詞（カンマ区切り、設定ファイルの値を上書き）')
+    parser.add_argument('--enable-stopwords', type=bool,
+                      help='ストップワードを使用するかどうか（設定ファイルの値を上書き）')
     
     args = parser.parse_args()
     
@@ -81,8 +84,10 @@ def main():
     output_dir = args.outdir or config['process_output']['value']['tokenize']
     stopwords_file = args.stopwords or config['stopwords_file']['value']
     pos_filter = args.pos_filter.split(',') if args.pos_filter else config['default_pos_filter']['value']
+    enable_stopwords = args.enable_stopwords if args.enable_stopwords is not None else \
+                      config['tokenize_params']['value'].get('enable_stopwords', True)
     
-    process_directory(input_dir, output_dir, stopwords_file, pos_filter)
+    process_directory(input_dir, output_dir, stopwords_file, pos_filter, enable_stopwords)
     print(f"全ファイルの形態素解析が完了しました")
 
 if __name__ == '__main__':

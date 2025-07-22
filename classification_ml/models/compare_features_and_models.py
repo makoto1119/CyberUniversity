@@ -140,6 +140,10 @@ def save_history(best_result, config, output_dir):
     unique_classes = set(best_result['y_test'])
     num_classes = len(unique_classes)
     
+    # stopwords設定の取得と確認
+    stopwords_enabled = config.get_stopwords_enabled()
+    print(f"\n保存時のstopwords設定: {'あり' if stopwords_enabled else 'なし'}")
+    
     # 新しい結果の行を作成
     new_row = {
         '日付': now.strftime('%Y-%m-%d'),
@@ -150,7 +154,7 @@ def save_history(best_result, config, output_dir):
         'サンプル数': total_samples,
         'テストデータ比率': f"{test_size:.2f}",
         '特徴量パラメータ': feature_params,
-        'ストップワード設定': 'なし',  # 現在の実装では未対応
+        'ストップワード設定': 'あり' if stopwords_enabled else 'なし',
         'ゆらぎ補正': 'なし',  # 現在の実装では未対応
         'F1スコア': f"{best_result['f1_score']:.4f}",
         'クラス数': num_classes,
@@ -308,6 +312,11 @@ def main():
     # 設定の読み込み
     config = ConfigLoader()
     paths = config.get_paths()
+    
+    # stopwords設定の確認
+    stopwords_enabled = config.get_stopwords_enabled()
+    print(f"\nstopwords設定: {'有効' if stopwords_enabled else '無効'}")
+    print("-"*50)
     
     # 入出力パスの設定
     labels_file = Path(paths["input"]["labels_file"])
