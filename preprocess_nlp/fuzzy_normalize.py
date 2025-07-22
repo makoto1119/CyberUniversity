@@ -89,7 +89,7 @@ def process_directory(input_dir, output_dir, patterns, params):
         with open(output_path, 'w', encoding='utf-8') as f:
             f.write(normalized)
         
-        print(f"正規化完了: {output_path}")
+        print(f"Processing: {file_path} -> {output_path}")
 
 def main():
     parser = argparse.ArgumentParser(description='テキストの正規化を行います')
@@ -113,8 +113,6 @@ def main():
     
     # ディレクトリ内の全ファイルを処理
     process_directory(input_dir, output_dir, patterns, normalize_params)
-    
-    print(f"全ファイルの正規化が完了しました")
 
 if __name__ == '__main__':
     main()
