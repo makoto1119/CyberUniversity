@@ -14,20 +14,22 @@ class ConfigLoader:
         
         # 前処理の設定ファイルを読み込む
         current_dir = os.path.dirname(os.path.abspath(self.config_path))
-        preprocess_config_path = os.path.join(os.path.dirname(current_dir), 'preprocess_nlp', 'preprocess_config.json')
+        preprocess_config_path = os.path.join(os.path.dirname(current_dir), 'preprocess_nlp', 'nlp_config.json')
         print(f"\n前処理設定ファイルのパス: {preprocess_config_path}")
         
         try:
             with open(preprocess_config_path, 'r', encoding='utf-8') as f:
                 self.preprocess_config = json.load(f)
                 stopwords_enabled = self.get_stopwords_enabled()
+                normalize_enabled = self.get_normalize_enabled()
                 print(f"前処理設定ファイルを読み込みました")
                 print(f"tokenize_params: {self.preprocess_config.get('tokenize_params', {}).get('value', {})}")
                 print(f"stopwords設定: {'有効' if stopwords_enabled else '無効'}")
+                print(f"ゆらぎ補正: {'有効' if normalize_enabled else '無効'}")
         except FileNotFoundError:
             print(f"警告: 前処理設定ファイルが見つかりません: {preprocess_config_path}")
             self.preprocess_config = {}
-            print("デフォルト設定を使用します: stopwords=False")
+            print("デフォルト設定を使用します: stopwords=False, ゆらぎ補正=False")
 
     def _load_config(self) -> Dict[str, Any]:
         """設定ファイルを読み込む
@@ -94,6 +96,7 @@ class ConfigLoader:
             return self.preprocess_config.get('tokenize_params', {}).get('value', {}).get('enable_stopwords', False)
         except (AttributeError, KeyError):
             return False
+
     def get_normalize_enabled(self) -> bool:
         """前処理設定からゆらぎ処理の有効/無効を取得
 

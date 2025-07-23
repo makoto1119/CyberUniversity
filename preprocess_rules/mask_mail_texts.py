@@ -1,72 +1,108 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# メール本文のマスキング処理（氏名、メールアドレス、企業名など）
+"""
+メール本文のマスキング処理（氏名、メールアドレス、企業名など）
+改善版：より精度の高いパターンマッチングを実装
+"""
 
 import re
 import json
 import shutil
 from pathlib import Path
-
-### for debug
-import traceback
-from inspect import currentframe
+from mask_patterns import get_all_patterns
 
 ### for log
 import logging
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-### functions
-def chkprint(*args):
-    names = {id(v):k for k,v in currentframe().f_back.f_locals.items()}
-    print(', '.join(names.get(id(arg),'???')+' : '+str(type(arg))+' = '+repr(arg) for arg in args))
-
-# JSON設定ファイルの読み込み
 def load_config(path="rule_config.json"):
+    """JSON設定ファイルの読み込み"""
     with open(path, encoding="utf-8") as f:
         return json.load(f)
 
 def mask_text(text, filters):
     """
     テキストをマスク処理する
-    filters: マスク処理の有効/無効を制御する辞書
+    Args:
+        text (str): マスク対象のテキスト
+        filters (dict): マスク処理の有効/無効を制御する辞書
+    Returns:
+        tuple: (マスク後のテキスト, 統計情報)
     """
-    stats = {
-        'NAME': 0,
-        'EMAIL': 0, 
-        'COMPANY': 0,
-        'URL': 0,
-        'PROFILE': 0
-    }
+    patterns = get_all_patterns()
+    stats = {key: 0 for key in patterns.keys()}
     
-    # 氏名 → [NAME]
-    if filters.get('name', True):
-        text, count = re.subn(r'[一-龥]{2,3}(さん|様)?', '[NAME]', text)
-        stats['NAME'] = count
-    
-    # メールアドレス → [EMAIL]
-    if filters.get('email', True):
-        text, count = re.subn(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+', '[EMAIL]', text)
-        stats['EMAIL'] = count
-    
-    # 企業名 → [COMPANY]
-    if filters.get('company', True):
-        text, count = re.subn(r'株式会社[^\s\n　]+', '[COMPANY]', text)
-        stats['COMPANY'] = count
-    
-    # URL → [URL]
-    if filters.get('url', True):
-        text, count = re.subn(r'https?://[^\s]+', '[URL]', text)
-        stats['URL'] = count
-    
-    # 年齢/性別/国籍など → [PROFILE]
-    if filters.get('profile', True):
-        text, count = re.subn(r'\d+歳/[男女]/[一-龥]+', '[PROFILE]', text)
-        stats['PROFILE'] = count
+    for mask_type, pattern_list in patterns.items():
+        if filters.get(mask_type.lower(), True):
+            for pattern in pattern_list:
+                try:
+                    text, count = re.subn(pattern, f'[{mask_type}]', text)
+                    stats[mask_type] += count
+                except re.error as e:
+                    logger.error(f"正規表現エラー - パターン: {pattern}, エラー: {str(e)}")
+                    continue
     
     return text, stats
 
+def process_file(src_path, dst_path, mask_filters):
+    """
+    1つのファイルに対してマスク処理を実行
+    Args:
+        src_path (Path): 入力ファイルのパス
+        dst_path (Path): 出力ファイルのパス
+        mask_filters (dict): マスクフィルターの設定
+    Returns:
+        dict: 処理結果の統計情報
+    """
+    try:
+        with open(src_path, encoding="utf-8") as f:
+            content = f.read()
+        
+        masked_text, stats = mask_text(content, mask_filters)
+        
+        with open(dst_path, "w", encoding="utf-8") as f:
+            f.write(masked_text)
+        
+        return {
+            'src': src_path.name,
+            'dst': dst_path.name,
+            'stats': stats,
+            'status': 'success'
+        }
+    except Exception as e:
+        logger.error(f"ファイル処理エラー - ファイル: {src_path}, エラー: {str(e)}")
+        return {
+            'src': src_path.name,
+            'dst': dst_path.name,
+            'stats': {},
+            'status': 'error',
+            'error': str(e)
+        }
+
+def write_log(results, log_file):
+    """
+    処理結果をログファイルに書き込む
+    Args:
+        results (list): 処理結果のリスト
+        log_file (Path): ログファイルのパス
+    """
+    with open(log_file, "w", encoding="utf-8") as log:
+        # ヘッダー行
+        log.write("元ファイル名,マスク後ファイル名,処理状態,NAME,EMAIL,COMPANY,URL,PROFILE\n")
+        
+        # 結果の書き込み
+        for result in results:
+            stats = result['stats']
+            status = result['status']
+            log.write(f"{result['src']},{result['dst']},{status}," + 
+                     f"{stats.get('NAME', 0)},{stats.get('EMAIL', 0)}," +
+                     f"{stats.get('COMPANY', 0)},{stats.get('URL', 0)}," +
+                     f"{stats.get('PROFILE', 0)}\n")
+
 def main():
+    """メイン処理"""
+    # 設定の読み込み
     config = load_config()
     SRC_DIR = Path(config["directories"]["save_dir"])
     DST_DIR = Path(config["directories"]["masked_dir"])
@@ -85,7 +121,7 @@ def main():
     for filter_name, enabled in mask_filters.items():
         print(f"- {filter_name}: {'enabled' if enabled else 'disabled'}")
     
-    # DST_DIRを削除して初期化
+    # DST_DIRの初期化
     if DST_DIR.exists():
         shutil.rmtree(DST_DIR)
         print(f"既存の {DST_DIR} を削除しました")
@@ -93,38 +129,29 @@ def main():
     DST_DIR.mkdir(exist_ok=True)
     print(f"{DST_DIR} を作成しました")
 
-    dir_name = DST_DIR.name  # 保存ファイルのprefixに使用
-    process_count = 0
-    
-    # ログファイルの初期化
-    log_file = Path("masked.log")
-    with open(log_file, "w", encoding="utf-8") as log:
-        log.write("元ファイル名,マスク後ファイル名,NAME,EMAIL,COMPANY,URL,PROFILE\n")
-
-    for path in sorted(SRC_DIR.glob("mail_data_*.txt")):
-        with open(path, encoding="utf-8") as f:
-            content = f.read()
-
-        masked_text, stats = mask_text(content, mask_filters)
-
-        # 元ファイルの連番を抽出
-        match = re.search(r'mail_data_(\d{3})\.txt$', path.name)
-        if match:
-            number = match.group(1)
-            masked_filename = DST_DIR / f"{dir_name}_{number}.txt"
-        else:
-            masked_filename = DST_DIR / f"{dir_name}_unknown.txt"
-
-        with open(masked_filename, "w", encoding="utf-8") as f:
-            f.write(masked_text)
-            process_count += 1
+    # ファイル処理
+    results = []
+    for src_path in sorted(SRC_DIR.glob("mail_data_*.txt")):
+        # 出力ファイル名の生成
+        match = re.search(r'mail_data_(\d{3})\.txt$', src_path.name)
+        number = match.group(1) if match else "unknown"
+        dst_path = DST_DIR / f"{DST_DIR.name}_{number}.txt"
         
-        # ログ出力
-        with open(log_file, "a", encoding="utf-8") as log:
-            log.write(f"{path.name},{masked_filename.name},{stats['NAME']},{stats['EMAIL']},{stats['COMPANY']},{stats['URL']},{stats['PROFILE']}\n")
-
-    print(f"Completed: {process_count} files saved to '{DST_DIR}' に {dir_name}_NNN.txt 形式で保存しました")
-    print(f"ログファイル : {log_file.resolve()} に処理結果を保存しました")
+        # ファイル処理の実行
+        result = process_file(src_path, dst_path, mask_filters)
+        results.append(result)
+    
+    # ログの出力
+    log_file = Path("masked.log")
+    write_log(results, log_file)
+    
+    # 処理結果のサマリー表示
+    success_count = sum(1 for r in results if r['status'] == 'success')
+    total_count = len(results)
+    print(f"\n処理完了:")
+    print(f"- 成功: {success_count}/{total_count} ファイル")
+    print(f"- 保存先: '{DST_DIR}' ({DST_DIR.name}_NNN.txt 形式)")
+    print(f"- ログファイル: {log_file.resolve()}")
 
 if __name__ == "__main__":
     main()
