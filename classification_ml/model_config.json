@@ -13,7 +13,7 @@
     "model_params": {
         "logistic_regression": {
             "C": [0.001, 0.01, 0.1, 1, 10, 100],
-            "solver": ["liblinear", "lbfgs"],
+            "solver": ["lbfgs"],
             "max_iter": 1000
         },
         "svm": {
