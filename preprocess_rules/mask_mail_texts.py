@@ -3,6 +3,7 @@
 # メール本文のマスキング処理（氏名、メールアドレス、企業名など）
 
 import re
+import json
 import shutil
 from pathlib import Path
 
@@ -20,17 +21,16 @@ def chkprint(*args):
     names = {id(v):k for k,v in currentframe().f_back.f_locals.items()}
     print(', '.join(names.get(id(arg),'???')+' : '+str(type(arg))+' = '+repr(arg) for arg in args))
 
-# 設定ファイルの読み込み
-def load_config(path="config"):
-    cfg = {}
+# JSON設定ファイルの読み込み
+def load_config(path="rule_config.json"):
     with open(path, encoding="utf-8") as f:
-        for line in f:
-            if line.strip() and not line.strip().startswith("#"):
-                key, value = line.strip().split("=", 1)
-                cfg[key.strip()] = value.strip()
-    return cfg
+        return json.load(f)
 
-def mask_text(text):
+def mask_text(text, filters):
+    """
+    テキストをマスク処理する
+    filters: マスク処理の有効/無効を制御する辞書
+    """
     stats = {
         'NAME': 0,
         'EMAIL': 0, 
@@ -40,31 +40,50 @@ def mask_text(text):
     }
     
     # 氏名 → [NAME]
-    text, count = re.subn(r'[一-龥]{2,3}(さん|様)?', '[NAME]', text)
-    stats['NAME'] = count
+    if filters.get('name', True):
+        text, count = re.subn(r'[一-龥]{2,3}(さん|様)?', '[NAME]', text)
+        stats['NAME'] = count
     
     # メールアドレス → [EMAIL]
-    text, count = re.subn(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+', '[EMAIL]', text)
-    stats['EMAIL'] = count
+    if filters.get('email', True):
+        text, count = re.subn(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+', '[EMAIL]', text)
+        stats['EMAIL'] = count
     
     # 企業名 → [COMPANY]
-    text, count = re.subn(r'株式会社[^\s\n　]+', '[COMPANY]', text)
-    stats['COMPANY'] = count
+    if filters.get('company', True):
+        text, count = re.subn(r'株式会社[^\s\n　]+', '[COMPANY]', text)
+        stats['COMPANY'] = count
     
     # URL → [URL]
-    text, count = re.subn(r'https?://[^\s]+', '[URL]', text)
-    stats['URL'] = count
+    if filters.get('url', True):
+        text, count = re.subn(r'https?://[^\s]+', '[URL]', text)
+        stats['URL'] = count
     
     # 年齢/性別/国籍など → [PROFILE]
-    text, count = re.subn(r'\d+歳/[男女]/[一-龥]+', '[PROFILE]', text)
-    stats['PROFILE'] = count
+    if filters.get('profile', True):
+        text, count = re.subn(r'\d+歳/[男女]/[一-龥]+', '[PROFILE]', text)
+        stats['PROFILE'] = count
     
     return text, stats
 
 def main():
     config = load_config()
-    SRC_DIR = Path(config.get("SAVE_DIR", "./mail_data"))
-    DST_DIR = Path(config.get("MASKED_DIR", "./mail_mask"))
+    SRC_DIR = Path(config["directories"]["save_dir"])
+    DST_DIR = Path(config["directories"]["masked_dir"])
+    
+    # マスクフィルターの設定を取得
+    mask_filters = config.get("mask_filters", {
+        "name": True,
+        "email": True,
+        "company": True,
+        "url": True,
+        "profile": True
+    })
+    
+    # 有効なフィルターの表示
+    print("Active filters:")
+    for filter_name, enabled in mask_filters.items():
+        print(f"- {filter_name}: {'enabled' if enabled else 'disabled'}")
     
     # DST_DIRを削除して初期化
     if DST_DIR.exists():
@@ -86,7 +105,7 @@ def main():
         with open(path, encoding="utf-8") as f:
             content = f.read()
 
-        masked_text, stats = mask_text(content)
+        masked_text, stats = mask_text(content, mask_filters)
 
         # 元ファイルの連番を抽出
         match = re.search(r'mail_data_(\d{3})\.txt$', path.name)

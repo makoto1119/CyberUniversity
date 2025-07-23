@@ -24,7 +24,7 @@
 ```
 preprocess_nlp/
 ├── README.md              # このドキュメント
-├── preprocess_config.json # 設定ファイル
+├── nlp_config.json # 設定ファイル
 ├── fuzzy_normalize.py     # テキスト正規化スクリプト
 ├── fuzzy_patterns.json    # 正規化パターン定義ファイル
 ├── tokenize_texts.py      # 形態素解析・トークン化スクリプト
@@ -33,9 +33,9 @@ preprocess_nlp/
 └── texts_tokenize/       # トークン化処理用テキストディレクトリ
 ```
 
-## 設定ファイル（preprocess_config.json）
+## 設定ファイル（nlp_config.json）
 
-プログラムの設定は `preprocess_config.json` で管理されています：
+プログラムの設定は `nlp_config.json` で管理されています：
 
 ```json
 {
@@ -93,7 +93,7 @@ pip install janome
 正規化済みテキスト（texts_fuzzy/）
 ```
 
-処理順序は `preprocess_config.json` の `process_input` の設定を変更することで変更可能です：
+処理順序は `nlp_config.json` の `process_input` の設定を変更することで変更可能です：
 
 1. デフォルト順序（形態素解析 → 正規化）:
 ```json
@@ -131,7 +131,7 @@ python tokenize_texts.py --indir ../shared_mail_mask --outdir texts_tokenize
 
 | オプション | 説明 | デフォルト値 |
 |-----------|------|-------------|
-| `--config` | 設定ファイルのパス | preprocess_config.json |
+| `--config` | 設定ファイルのパス | nlp_config.json |
 | `--indir` | 入力ディレクトリのパス | 設定ファイルの値 |
 | `--outdir` | 出力ディレクトリのパス | 設定ファイルの値 |
 | `--stopwords` | ストップワードファイルのパス | 設定ファイルの値 |
@@ -165,7 +165,7 @@ python tokenize_texts.py --indir ../shared_mail_mask --outdir texts_tokenize
    - 手順1で置換した技術用語を元に戻す
    - カタカナのまま保持される
 
-これらの処理は preprocess_config.json の normalize_params で制御できます：
+これらの処理は nlp_config.json の normalize_params で制御できます：
 ```json
 "normalize_params": {
     "value": {
@@ -189,7 +189,7 @@ python fuzzy_normalize.py --indir texts_tokenize --outdir texts_fuzzy
 
 | オプション | 説明 | デフォルト値 |
 |-----------|------|-------------|
-| `--config` | 設定ファイルのパス | preprocess_config.json |
+| `--config` | 設定ファイルのパス | nlp_config.json |
 | `--indir` | 入力ディレクトリのパス | 設定ファイルの値 |
 | `--outdir` | 出力ディレクトリのパス | 設定ファイルの値 |
 

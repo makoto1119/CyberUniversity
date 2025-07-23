@@ -6,7 +6,7 @@ from pathlib import Path
 from janome.tokenizer import Tokenizer
 import re
 
-def load_config(config_file='preprocess_config.json'):
+def load_config(config_file='nlp_config.json'):
     """設定ファイルを読み込む"""
     with open(config_file, 'r', encoding='utf-8') as f:
         return json.load(f)
@@ -61,7 +61,7 @@ def process_directory(input_dir, output_dir, stopwords_file, pos_filter, enable_
 
 def main():
     parser = argparse.ArgumentParser(description='テキストの形態素解析を行います')
-    parser.add_argument('--config', default='preprocess_config.json',
+    parser.add_argument('--config', default='nlp_config.json',
                       help='設定ファイルのパス')
     parser.add_argument('--indir',
                       help='入力ディレクトリのパス（設定ファイルの値を上書き）')

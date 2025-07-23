@@ -17,8 +17,8 @@
 ├── README.md                          # 本ドキュメント
 ├── get_mail_imap.py                   # メール取得スクリプト
 ├── mask_mail_texts.py                 # マスク処理スクリプト
-├── config_sample                      # 設定テンプレート
-├── config                             # 実際の設定ファイル（非Git管理）
+├── rule_config_sample.json            # 設定テンプレート
+├── rule_config.json                   # 実際の設定ファイル（非Git管理）
 ├── masked.log                         # マスキングログ（非Git管理）
 ├── mail_data/                         # 生メールデータ（非Git管理）
 └── mail_mask/                         # マスク済みデータ（非Git管理）
@@ -36,18 +36,20 @@
 
 1. 設定ファイルの準備
    ```bash
-   cp config_sample config
+   cp rule_config_sample.json rule_config.json
    ```
 
-2. `config`ファイルの編集
-   ```ini
-   EMAIL_ADDRESS=your-email@gmail.com
-   EMAIL_PASSWORD=your-app-password
-   DATE_SINCE=01-Jul-2025
-   MAX_MAILS=10
-   LABEL_NAME=
-   SAVE_DIR=./mail_data
-   MASKED_DIR=./mail_mask
+2. `rule_config.json`ファイルの編集
+   ```json
+   {
+     "email_address": "your-email@gmail.com",
+     "email_password": "your-app-password",
+     "date_since": "01-Jul-2025",
+     "max_mails": 10,
+     "label_name": "",
+     "save_dir": "./mail_data",
+     "masked_dir": "./mail_mask"
+   }
    ```
 
 ## 使い方
@@ -66,13 +68,13 @@
 
 | 設定項目 | 説明 | デフォルト値 |
 |---------|------|-------------|
-| EMAIL_ADDRESS | Gmailアドレス | 必須 |
-| EMAIL_PASSWORD | アプリパスワード | 必須 |
-| DATE_SINCE | 取得開始日 | 01-Jul-2025 |
-| MAX_MAILS | 最大取得件数 | 10 |
-| LABEL_NAME | 対象ラベル | 空（INBOX） |
-| SAVE_DIR | 生メール保存先 | ./mail_data |
-| MASKED_DIR | マスク後保存先 | ./mail_mask |
+| email_address | Gmailアドレス | 必須 |
+| email_password | アプリパスワード | 必須 |
+| date_since | 取得開始日 | 01-Jul-2025 |
+| max_mails | 最大取得件数 | 10 |
+| label_name | 対象ラベル | 空（INBOX） |
+| save_dir | 生メール保存先 | ./mail_data |
+| masked_dir | マスク後保存先 | ./mail_mask |
 
 ## マスク処理の仕組み
 
@@ -87,7 +89,7 @@
 1. [Googleアカウント設定](https://myaccount.google.com/)で2段階認証を有効化
 2. セキュリティ → アプリパスワードを選択
 3. アプリ:「メール」、デバイス:「その他」で生成
-4. 生成されたパスワードを`config`の`EMAIL_PASSWORD`に設定
+4. 生成されたパスワードを`rule_config.json`の`email_password`に設定
 
 ## トラブルシューティング
 

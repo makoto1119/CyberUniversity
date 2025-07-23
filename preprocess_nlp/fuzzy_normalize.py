@@ -93,7 +93,7 @@ def process_directory(input_dir, output_dir, patterns, params):
 
 def main():
     parser = argparse.ArgumentParser(description='テキストの正規化を行います')
-    parser.add_argument('--config', default='preprocess_config.json', help='設定ファイルのパス')
+    parser.add_argument('--config', default='nlp_config.json', help='設定ファイルのパス')
     parser.add_argument('--indir', help='入力ディレクトリのパス（設定ファイルの値を上書き）')
     parser.add_argument('--outdir', help='出力ディレクトリのパス（設定ファイルの値を上書き）')
     

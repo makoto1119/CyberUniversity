@@ -5,6 +5,7 @@
 import os
 import email
 import re
+import json
 import shutil
 from email.header import decode_header
 from imapclient import IMAPClient
@@ -83,15 +84,10 @@ def format_mail_content(subject, body):
     
     return formatted_content
 
-# 設定読み込み（key=value形式）
-def load_config(path="config"):
-    cfg = {}
+# JSON設定読み込み
+def load_config(path="rule_config.json"):
     with open(path, encoding="utf-8") as f:
-        for line in f:
-            if line.strip() and not line.strip().startswith("#"):
-                key, value = line.strip().split("=", 1)
-                cfg[key.strip()] = value.strip()
-    return cfg
+        return json.load(f)
 
 def main():
     """
@@ -105,15 +101,15 @@ def main():
         print("OK: Config file loaded")
     except Exception as e:
         print(f"Error: Failed to load config file - {e}")
-        print("Please ensure 'config' file exists and has correct format")
+        print("Please ensure 'rule_config.json' file exists and has correct format")
         return
     
-    EMAIL_ADDRESS  = config["EMAIL_ADDRESS"]
-    EMAIL_PASSWORD = config["EMAIL_PASSWORD"]
-    DATE_SINCE     = config.get("DATE_SINCE", "01-Jul-2025")
-    MAX_MAILS      = int(config.get("MAX_MAILS", 10))
-    SAVE_DIR       = Path(config.get("SAVE_DIR", "./mails"))
-    LABEL_NAME     = config.get("LABEL_NAME", "")  # ラベル指定（空の場合はINBOX）
+    EMAIL_ADDRESS = config["email"]["address"]
+    EMAIL_PASSWORD = config["email"]["password"]
+    DATE_SINCE = config["fetch_settings"]["date_since"]
+    MAX_MAILS = config["fetch_settings"]["max_mails"]
+    SAVE_DIR = Path(config["directories"]["save_dir"])
+    LABEL_NAME = config["fetch_settings"]["label_name"]
     
     # 保存ディレクトリ初期化/作成
     if SAVE_DIR.exists():

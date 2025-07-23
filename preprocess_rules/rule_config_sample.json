@@ -1,0 +1,29 @@
+{
+    "email": {
+        "address": "your-email@gmail.com",
+        "password": "your-app-password"
+    },
+    "fetch_settings": {
+        "date_since": "01-Jul-2025",
+        "max_mails": 10,
+        "label_name": ""
+    },
+    "directories": {
+        "save_dir": "./mail_data",
+        "masked_dir": "./mail_mask",
+        "morphological_dir": "./mail_morphological",
+        "stopwords_path": "./stopwords.txt"
+    },
+    "morphological_analysis": {
+        "enable_pos_filter": true,
+        "pos_filter_mode": "whitelist",
+        "enable_base_form": true
+    },
+    "mask_filters": {
+        "name": true,
+        "email": true,
+        "company": true,
+        "url": true,
+        "profile": true
+    }
+}
