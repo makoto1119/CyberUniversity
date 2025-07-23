@@ -218,41 +218,70 @@ def save_evaluation_summary(results, output_dir):
 
 def tune_hyperparameters(X_train, y_train):
     """ハイパーパラメータチューニング"""
-    # ロジスティック回帰のパラメータグリッド
-    lr_param_grid = {
+    # 設定の読み込み
+    config = ConfigLoader()
+    model_params = config.get_model_params()
+
+    # デフォルトのパラメータグリッド
+    default_lr_params = {
         'C': [0.001, 0.01, 0.1, 1, 10, 100],
         'solver': ['liblinear', 'lbfgs'],
         'max_iter': [1000]
     }
-    
-    # SVMのパラメータグリッド（設定ファイルから読み込み）
-    svm_config = config.get_model_params().get('svm', {})
-    svm_param_grid = {
-        'C': svm_config.get('C', [0.1, 1, 10]),
-        'kernel': svm_config.get('kernel', ['linear', 'rbf']),
-        'gamma': svm_config.get('gamma', ['scale', 'auto', 0.1, 1]),
-        'probability': [True]  # 確率予測を有効化
+
+    default_svm_params = {
+        'C': [0.1, 1, 10],
+        'kernel': ['linear', 'rbf'],
+        'gamma': ['scale', 'auto', 0.1, 1],
+        'probability': [True]
     }
-    
-    # ランダムフォレストのパラメータグリッド
-    rf_param_grid = {
+
+    default_rf_params = {
         'n_estimators': [50, 100, 200],
         'max_depth': [None, 10, 20],
         'min_samples_split': [2, 5, 10]
     }
+
+    default_nb_params = {
+        'var_smoothing': [1e-9, 1e-8, 1e-7, 1e-6]
+    }
+
+    # 設定ファイルのパラメータでデフォルト値を上書き
+    lr_config = model_params.get('logistic_regression', {})
+    lr_param_grid = default_lr_params.copy()
+    if 'C' in lr_config: lr_param_grid['C'] = lr_config['C']
+    if 'solver' in lr_config: lr_param_grid['solver'] = lr_config['solver']
+    if 'max_iter' in lr_config: lr_param_grid['max_iter'] = [lr_config['max_iter']]
+
+    svm_config = model_params.get('svm', {})
+    svm_param_grid = default_svm_params.copy()
+    if 'C' in svm_config: svm_param_grid['C'] = svm_config['C']
+    if 'kernel' in svm_config: svm_param_grid['kernel'] = svm_config['kernel']
+    if 'gamma' in svm_config: svm_param_grid['gamma'] = svm_config['gamma']
+
+    rf_config = model_params.get('random_forest', {})
+    rf_param_grid = default_rf_params.copy()
+    if 'n_estimators' in rf_config: rf_param_grid['n_estimators'] = rf_config['n_estimators']
+    if 'max_depth' in rf_config: rf_param_grid['max_depth'] = rf_config['max_depth']
+    if 'min_samples_split' in rf_config: rf_param_grid['min_samples_split'] = rf_config['min_samples_split']
+
+    # GaussianNBのパラメータグリッド
+    nb_config = model_params.get('naive_bayes', {})
+    nb_param_grid = default_nb_params.copy()
+    if 'var_smoothing' in nb_config: nb_param_grid['var_smoothing'] = nb_config['var_smoothing']
     
-    # グリッドサーチの実行（パラメータを改善）
+    # グリッドサーチの実行
     common_params = {
         'cv': 5,                    # 5分割交差検証
         'scoring': 'f1_weighted',   # 評価指標
-        'verbose': 1,               # 進捗表示
+        'verbose': 1,              # 進捗表示
         'n_jobs': -1,              # 全CPU使用
         'return_train_score': True  # 訓練スコアも記録
     }
     
     # ロジスティック回帰
     lr_grid = GridSearchCV(
-        LogisticRegression(max_iter=1000),
+        LogisticRegression(),
         lr_param_grid,
         **common_params
     )
@@ -263,7 +292,7 @@ def tune_hyperparameters(X_train, y_train):
     
     # SVM
     svm_grid = GridSearchCV(
-        SVC(probability=True),
+        SVC(),
         svm_param_grid,
         **common_params
     )
@@ -282,12 +311,24 @@ def tune_hyperparameters(X_train, y_train):
     rf_grid.fit(X_train, y_train)
     print(f"最適パラメータ: {rf_grid.best_params_}")
     print(f"最良スコア: {rf_grid.best_score_:.4f}")
+
+    # GaussianNB
+    nb_grid = GridSearchCV(
+        GaussianNB(),
+        nb_param_grid,
+        **common_params
+    )
+    print("\nGaussianNBのパラメータ探索中...")
+    nb_grid.fit(X_train, y_train)
+    print(f"最適パラメータ: {nb_grid.best_params_}")
+    print(f"最良スコア: {nb_grid.best_score_:.4f}")
     
     # 最適なパラメータを持つモデルを返す
     return {
         'LogisticRegression': lr_grid.best_estimator_,
         'SVM': svm_grid.best_estimator_,
-        'RandomForest': rf_grid.best_estimator_
+        'RandomForest': rf_grid.best_estimator_,
+        'NaiveBayes': nb_grid.best_estimator_
     }
 
 def process_feature_set(feature_dir, feature_name, label_map, output_dir):
