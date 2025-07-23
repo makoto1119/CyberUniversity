@@ -225,14 +225,13 @@ def tune_hyperparameters(X_train, y_train):
         'max_iter': [1000]
     }
     
-    # SVMのパラメータグリッド（改善版）
+    # SVMのパラメータグリッド（設定ファイルから読み込み）
+    svm_config = config.get_model_params().get('svm', {})
     svm_param_grid = {
-        'C': [0.1, 1, 10, 100],
-        'kernel': ['linear', 'rbf', 'poly'],
-        'gamma': ['scale', 'auto', 0.01, 0.1, 1],
-        'class_weight': ['balanced', None],
-        'probability': [True],
-        'degree': [2, 3]  # polyカーネル用
+        'C': svm_config.get('C', [0.1, 1, 10]),
+        'kernel': svm_config.get('kernel', ['linear', 'rbf']),
+        'gamma': svm_config.get('gamma', ['scale', 'auto', 0.1, 1]),
+        'probability': [True]  # 確率予測を有効化
     }
     
     # ランダムフォレストのパラメータグリッド

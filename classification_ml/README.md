@@ -92,6 +92,11 @@ model_config.jsonで入力データのソースを指定できます：
         "logistic_regression": {
             "max_iter": 1000
         },
+        "svm": {
+            "C": [0.1, 1, 10],
+            "kernel": ["linear", "rbf"],
+            "gamma": ["scale", "auto", 0.1, 1]
+        },
         "test_size": 0.3
     }
 }
