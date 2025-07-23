@@ -242,15 +242,47 @@ def tune_hyperparameters(X_train, y_train):
         'min_samples_split': [2, 5, 10]
     }
     
-    # グリッドサーチの実行
-    lr_grid = GridSearchCV(LogisticRegression(), lr_param_grid, cv=5, scoring='f1_weighted')
+    # グリッドサーチの実行（パラメータを改善）
+    common_params = {
+        'cv': 5,                    # 5分割交差検証
+        'scoring': 'f1_weighted',   # 評価指標
+        'verbose': 1,               # 進捗表示
+        'n_jobs': -1,              # 全CPU使用
+        'return_train_score': True  # 訓練スコアも記録
+    }
+    
+    # ロジスティック回帰
+    lr_grid = GridSearchCV(
+        LogisticRegression(max_iter=1000),
+        lr_param_grid,
+        **common_params
+    )
+    print("\nロジスティック回帰のパラメータ探索中...")
     lr_grid.fit(X_train, y_train)
+    print(f"最適パラメータ: {lr_grid.best_params_}")
+    print(f"最良スコア: {lr_grid.best_score_:.4f}")
     
-    svm_grid = GridSearchCV(SVC(), svm_param_grid, cv=5, scoring='f1_weighted')
+    # SVM
+    svm_grid = GridSearchCV(
+        SVC(probability=True),
+        svm_param_grid,
+        **common_params
+    )
+    print("\nSVMのパラメータ探索中...")
     svm_grid.fit(X_train, y_train)
+    print(f"最適パラメータ: {svm_grid.best_params_}")
+    print(f"最良スコア: {svm_grid.best_score_:.4f}")
     
-    rf_grid = GridSearchCV(RandomForestClassifier(), rf_param_grid, cv=5, scoring='f1_weighted')
+    # ランダムフォレスト
+    rf_grid = GridSearchCV(
+        RandomForestClassifier(),
+        rf_param_grid,
+        **common_params
+    )
+    print("\nランダムフォレストのパラメータ探索中...")
     rf_grid.fit(X_train, y_train)
+    print(f"最適パラメータ: {rf_grid.best_params_}")
+    print(f"最良スコア: {rf_grid.best_score_:.4f}")
     
     # 最適なパラメータを持つモデルを返す
     return {
