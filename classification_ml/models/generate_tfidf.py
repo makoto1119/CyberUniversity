@@ -55,9 +55,13 @@ def main():
     with open(output_dir / "tfidf_vectorizer.pkl", "wb") as f:
         pickle.dump(vectorizer, f)
     
-    # 特徴量の次元数を表示
-    print(f"特徴量の次元数: {X.shape[1]}")
-    print(f"文書数: {X.shape[0]}")
+    # 前処理設定と特徴量情報を表示
+    print("\n=== 前処理設定 ===")
+    print(f"- stopwords: {'有効' if config.get_stopwords_enabled() else '無効'}")
+    print(f"- ゆらぎ補正: {'有効' if config.get_normalize_enabled() else '無効'}")
+    print("\n=== 特徴量情報 ===")
+    print(f"- 特徴量の次元数: {X.shape[1]}")
+    print(f"- 文書数: {X.shape[0]}")
     
     # 各文書のTF-IDF特徴量をJSONファイルとして保存
     for i, fname in enumerate(filenames):

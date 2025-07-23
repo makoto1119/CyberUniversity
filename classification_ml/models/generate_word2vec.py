@@ -58,10 +58,18 @@ def main():
     if not docs:
         raise ValueError("テキストファイルが見つからないか、すべてが空です")
 
-    print(f"読み込み完了: {len(docs)}件の文書")
+    # 前処理設定と特徴量情報を表示
+    print("\n=== 前処理設定 ===")
+    print(f"- stopwords: {'有効' if config.get_stopwords_enabled() else '無効'}")
+    print(f"- ゆらぎ補正: {'有効' if config.get_normalize_enabled() else '無効'}")
+    print("\n=== 特徴量情報 ===")
+    print(f"- 文書数: {len(docs)}件")
+    print(f"- ベクトル次元数: {word2vec_params['vector_size']}")
+    print(f"- 文脈窓サイズ: {word2vec_params['window']}")
+    print(f"- 最小出現回数: {word2vec_params['min_count']}")
 
     # Word2Vecモデルの学習
-    print("Word2Vecモデルの学習中...")
+    print("\nWord2Vecモデルの学習中...")
     model = Word2Vec(min_count=word2vec_params["min_count"],
                     window=word2vec_params["window"],
                     vector_size=word2vec_params["vector_size"],

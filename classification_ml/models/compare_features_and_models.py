@@ -26,10 +26,12 @@ def load_vectors(vec_dir):
     print(f"\nベクトルデータの読み込みを開始: {vec_dir}")
     
     # まず全てのベクトルを読み込む
-    for path in sorted(vec_dir.glob("*.json")):
+    for i, path in enumerate(sorted(vec_dir.glob("*.json"))):
         # モデルファイルを除外
         if not path.name.endswith(".pkl") and not path.name.endswith(".model"):
-            print(f"処理中のファイル: {path.name}")  # デバッグ出力
+            # 最初の5件のみ表示
+            if i < 5:
+                print(f"処理中のファイル: {path.name}")  # デバッグ出力
             with path.open(encoding="utf-8") as f:
                 vec = json.load(f)
                 if isinstance(vec, list):  # ベクトルがリスト形式であることを確認
@@ -37,7 +39,8 @@ def load_vectors(vec_dir):
                     # 拡張子を除いたファイル名を保存
                     base_name = path.stem
                     filenames.append(base_name)
-                    print(f"読み込み成功: {base_name}")  # デバッグ出力
+                    if i < 5:
+                        print(f"読み込み成功: {base_name}")  # デバッグ出力
     
     print(f"\n合計で{len(vectors)}個のベクトルを読み込みました")
     
@@ -77,9 +80,9 @@ def evaluate_model(model, X_train, X_test, y_train, y_test, model_name, feature_
     # 予測
     y_pred = model.predict(X_test)
     
-    # 評価
-    report = classification_report(y_test, y_pred, output_dict=True)
-    f1 = f1_score(y_test, y_pred, average='weighted')
+    # 評価（zero_division=1を設定して警告を抑制）
+    report = classification_report(y_test, y_pred, output_dict=True, zero_division=1)
+    f1 = f1_score(y_test, y_pred, average='weighted', zero_division=1)
     
     # 混同行列
     cm = confusion_matrix(y_test, y_pred)
@@ -201,8 +204,8 @@ def save_evaluation_summary(results, output_dir):
             f.write("-" * 40 + "\n")
             f.write(f"F1スコア: {r['f1_score']:.4f}\n\n")
             f.write("分類レポート:\n")
-            # 分類レポートを文字列形式で取得
-            report = classification_report(r['y_test'], r['y_pred'])
+            # 分類レポートを文字列形式で取得（zero_division=1を設定）
+            report = classification_report(r['y_test'], r['y_pred'], zero_division=1)
             f.write(report + "\n")
             f.write("-" * 40 + "\n")
         
@@ -333,7 +336,7 @@ def process_feature_set(feature_dir, feature_name, label_map, output_dir):
         print("-"*30)
         print(f"F1スコア: {result['f1_score']:.4f}")
         print("\n分類レポート:")
-        print(classification_report(y_test, result['y_pred']))
+        print(classification_report(y_test, result['y_pred'], zero_division=1))
     
     return results
 
