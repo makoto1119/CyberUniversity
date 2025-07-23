@@ -135,8 +135,11 @@ def save_history(best_result, config, output_dir):
     model_params = config.get_model_params()
     test_size = model_params.get('test_size', 0.3)  # デフォルト値として0.3を使用
     
-    # 全データ数を計算
-    total_samples = int(len(best_result['y_test']) / test_size)
+    # 全データ数を計算（入力ディレクトリのファイル数）
+    input_path = config.get_paths()["input"]["data_paths"][data_source]
+    import glob
+    total_data = len(glob.glob(input_path))
+    labeled_data = len(best_result['y_test']) / test_size  # ラベル付きデータ数
     
     # 特徴量の種類に応じたパラメータを取得
     feature_params = ""
@@ -165,27 +168,29 @@ def save_history(best_result, config, output_dir):
         '特徴量手法': best_result['feature_name'],
         '分類モデル': best_result['model_name'],
         '入力データ種別': data_source,
-        'サンプル数': total_samples,
+        '全データ数': f"{int(total_data)}",
+        'ラベル付きデータ数': f"{int(labeled_data)}",
         'テストデータ比率': f"{test_size:.2f}",
         '特徴量パラメータ': feature_params,
         'ストップワード設定': 'あり' if stopwords_enabled else 'なし',
         'ゆらぎ補正': 'あり' if normalize_enabled else 'なし',
         'F1スコア': f"{best_result['f1_score']:.4f}",
-        'クラス数': num_classes,
+        'クラス数': f"{int(num_classes)}",
         '備考・変更点': ''
     }
     
     # CSVファイルが存在する場合は追記、存在しない場合は新規作成
     columns = [
         '日付', '時間', '特徴量手法', '分類モデル', '入力データ種別',
-        'サンプル数', 'テストデータ比率', '特徴量パラメータ',
+        '全データ数', 'ラベル付きデータ数', 'テストデータ比率', '特徴量パラメータ',
         'ストップワード設定', 'ゆらぎ補正', 'F1スコア', 'クラス数',
         '備考・変更点'
     ]
     
     if history_file.exists():
         df = pd.read_csv(history_file)
-        df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+        new_df = pd.DataFrame([new_row])
+        df = pd.concat([df, new_df], ignore_index=True)
     else:
         df = pd.DataFrame([new_row], columns=columns)
     

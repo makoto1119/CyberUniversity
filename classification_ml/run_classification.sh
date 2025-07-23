@@ -21,6 +21,13 @@ data_source=$(jq -r '.input.data_source' model_config.json)
 input_path=$(jq -r ".input.data_paths.$data_source" model_config.json)
 echo "データソース: $data_source"
 echo "入力パス: $input_path"
+
+# 全データ数とラベル付きデータ数を計算
+total_data=$(ls -1 ../shared_texts_fuzzy/*.txt 2>/dev/null | wc -l)
+labeled_data=$(wc -l < labels.csv)
+
+echo "全データ数: $total_data"
+echo "ラベル付きデータ数: $labeled_data"
 echo
 
 echo "----------------------------------------"
