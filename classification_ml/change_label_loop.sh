@@ -2,7 +2,7 @@
 
 
 ### ここを変更して再開ポイントを指定
-from="mail_data_101.txt"
+from="mail_data_151.txt"
 
 
 mail_dir="../shared_mail_data"

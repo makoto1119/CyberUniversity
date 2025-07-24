@@ -74,9 +74,10 @@ def process_directory(input_dir, output_dir, patterns, params):
                         key=lambda x: get_number_from_filename(x.name))
     
     # 入力ディレクトリ内の全ファイルを処理
-    for i, file_path in enumerate(input_files, 1):
-        # 出力ファイルパスの生成（texts_fuzzy_001.txt の形式）
-        output_path = Path(output_dir) / f'texts_fuzzy_{i:03d}.txt'
+    for file_path in input_files:
+        # 入力ファイルの番号を維持して出力ファイル名を生成
+        file_number = get_number_from_filename(file_path.name)
+        output_path = Path(output_dir) / f'texts_fuzzy_{file_number:03d}.txt'
         
         # ファイルの処理
         with open(file_path, encoding='utf-8') as f:

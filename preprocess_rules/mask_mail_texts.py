@@ -133,8 +133,11 @@ def main():
     results = []
     for src_path in sorted(SRC_DIR.glob("mail_data_*.txt")):
         # 出力ファイル名の生成
-        match = re.search(r'mail_data_(\d{3})\.txt$', src_path.name)
+        match = re.search(r'mail_data_(\d+)\.txt$', src_path.name)
         number = match.group(1) if match else "unknown"
+        # 数字の桁数を3桁に揃える（4桁以上の場合はそのまま）
+        if number != "unknown":
+            number = number.zfill(3) if len(number) <= 3 else number
         dst_path = DST_DIR / f"{DST_DIR.name}_{number}.txt"
         
         # ファイル処理の実行

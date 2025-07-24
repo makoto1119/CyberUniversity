@@ -18,8 +18,10 @@ def load_stopwords(stopwords_file):
 
 def get_number_from_filename(filename):
     """ファイル名から数字部分を抽出する"""
-    match = re.search(r'(\d+)', filename)
-    return int(match.group(1)) if match else 0
+    if 'unknown' in filename.lower():
+        return None
+    match = re.search(r'mail_mask_(\d+)\.txt$', filename)
+    return int(match.group(1)) if match else None
 
 def process_file(input_file, output_file, stopwords, pos_filter, enable_stopwords=True):
     """単一ファイルの形態素解析を行う"""
@@ -54,8 +56,13 @@ def process_directory(input_dir, output_dir, stopwords_file, pos_filter, enable_
                         key=lambda x: get_number_from_filename(x.name))
     
     # 各ファイルの処理
-    for i, input_file in enumerate(input_files, 1):
-        output_file = output_path / f'texts_tokenize_{i:03d}.txt'
+    for input_file in input_files:
+        # 入力ファイルの番号を維持して出力ファイル名を生成
+        file_number = get_number_from_filename(input_file.name)
+        if file_number is None:  # unknown ファイルの場合はスキップ
+            print(f"Skipping: {input_file}")
+            continue
+        output_file = output_path / f'texts_tokenize_{file_number:03d}.txt'
         print(f"Processing: {input_file} -> {output_file}")
         process_file(str(input_file), str(output_file), stopwords, pos_filter, enable_stopwords)
 

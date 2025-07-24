@@ -4,6 +4,7 @@ config
 *.log
 mail_data/
 mail_mask/
+mail_unused/
 texts_fuzzy/
 texts_tokenize/
 features_word2vec/
